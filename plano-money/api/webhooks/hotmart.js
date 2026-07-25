@@ -21,6 +21,7 @@ export default async function handler(req, res) {
   const purchaseStatus = body.data?.purchase?.status
   const email = body.data?.buyer?.email
   const transactionId = body.data?.purchase?.transaction
+  const productId = body.data?.product?.id != null ? String(body.data.product.id) : null
   // Stays constant across renewal charges for the same subscriber, unlike
   // the transaction id — this is what later cancellation/refund events use
   // to find their way back to the right household. Field name/path can
@@ -28,7 +29,17 @@ export default async function handler(req, res) {
   // and adjust here if this doesn't come through.
   const subscriberCode = body.data?.subscription?.subscriber?.code
 
+  // Only the main Plano.Money product grants a new account — an order
+  // bump / upsell / downsell approved in the same checkout still gets
+  // paid normally, it just doesn't fire its own separate "create your
+  // account" email. Set HOTMART_PRODUCT_ID once you have the main
+  // product's id; until then every product is treated as "grants access"
+  // so testing isn't blocked on this being configured.
+  const mainProductId = process.env.HOTMART_PRODUCT_ID
+  const isMainProduct = !mainProductId || productId === mainProductId
+
   const isApprovedPurchase =
+    isMainProduct &&
     (eventType === 'PURCHASE_APPROVED' || eventType === 'PURCHASE_COMPLETE') &&
     (!purchaseStatus || APPROVED_STATUSES.has(purchaseStatus))
 
@@ -39,7 +50,7 @@ export default async function handler(req, res) {
       // A renewal charge for a subscriber who'd previously been suspended
       // (lapsed payment, now paid again) gets their access back.
       if (subscriberCode) await setAccessSuspended({ source: 'hotmart', ref: subscriberCode, suspended: false })
-    } else if (CANCEL_EVENTS.has(eventType) && subscriberCode) {
+    } else if (isMainProduct && CANCEL_EVENTS.has(eventType) && subscriberCode) {
       await setAccessSuspended({ source: 'hotmart', ref: subscriberCode, suspended: true })
     }
   } catch (err) {
