@@ -1,20 +1,64 @@
 import { useState } from 'react'
-import { LogIn } from 'lucide-react'
+import { LogIn, UserPlus } from 'lucide-react'
 import Logo from './Logo.jsx'
+import { supabase } from '../lib/supabaseClient.js'
 
-export default function LoginScreen({ t, onLogin }) {
+export default function LoginScreen({ t }) {
+  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    if (!fullName.trim() || !email.trim()) return
-    onLogin({ fullName: fullName.trim(), email: email.trim().toLowerCase() })
+    setError('')
+    setMessage('')
+    setLoading(true)
+    try {
+      if (mode === 'signup') {
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: email.trim().toLowerCase(),
+          password,
+          options: { data: { full_name: fullName.trim() } },
+        })
+        if (signUpError) throw signUpError
+        if (!data.session) setMessage(t.authCheckEmail)
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password,
+        })
+        if (signInError) throw signInError
+      }
+    } catch (err) {
+      setError(err.message || String(err))
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleForgotPassword = () => {
-    alert(t.passwordResetPending)
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setError(t.forgotPasswordNeedsEmail)
+      return
+    }
+    setError('')
+    setMessage('')
+    setLoading(true)
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+        redirectTo: window.location.origin,
+      })
+      if (resetError) throw resetError
+      setMessage(t.authResetSent)
+    } catch (err) {
+      setError(err.message || String(err))
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -24,18 +68,37 @@ export default function LoginScreen({ t, onLogin }) {
         <h2 className="text-xl sm:text-2xl font-bold text-navy-900 mb-2">{t.loginTitle}</h2>
         <p className="text-slate-500 text-xs sm:text-sm mb-6">{t.loginSubtitle}</p>
 
+        <div className="flex bg-slate-100 rounded-xl p-1 mb-5">
+          <button
+            type="button"
+            onClick={() => { setMode('signin'); setError(''); setMessage('') }}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${mode === 'signin' ? 'bg-white shadow-sm text-navy-900' : 'text-slate-500'}`}
+          >
+            {t.authSignInTab}
+          </button>
+          <button
+            type="button"
+            onClick={() => { setMode('signup'); setError(''); setMessage('') }}
+            className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${mode === 'signup' ? 'bg-white shadow-sm text-navy-900' : 'text-slate-500'}`}
+          >
+            {t.authSignUpTab}
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-3">
-          <div className="text-left">
-            <input
-              type="text"
-              required
-              maxLength={80}
-              value={fullName}
-              onChange={e => setFullName(e.target.value)}
-              placeholder={t.namePlaceholder}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
-            />
-          </div>
+          {mode === 'signup' && (
+            <div className="text-left">
+              <input
+                type="text"
+                required
+                maxLength={80}
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                placeholder={t.namePlaceholder}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
+              />
+            </div>
+          )}
           <div className="text-left">
             <input
               type="email"
@@ -49,24 +112,34 @@ export default function LoginScreen({ t, onLogin }) {
           <div className="text-left">
             <input
               type="password"
+              required
+              minLength={6}
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder={t.passwordPlaceholder}
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
             />
-            <button
-              type="button"
-              onClick={handleForgotPassword}
-              className="text-xs text-brand-600 hover:text-brand-700 font-semibold mt-1.5 ml-1"
-            >
-              {t.forgotPassword}
-            </button>
+            {mode === 'signin' && (
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-xs text-brand-600 hover:text-brand-700 font-semibold mt-1.5 ml-1"
+              >
+                {t.forgotPassword}
+              </button>
+            )}
           </div>
+
+          {error && <p className="text-xs text-red-600 font-semibold text-left">{error}</p>}
+          {message && <p className="text-xs text-emerald-600 font-semibold text-left">{message}</p>}
+
           <button
             type="submit"
-            className="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
+            disabled={loading}
+            className="w-full bg-navy-900 hover:bg-navy-800 disabled:opacity-60 text-white font-bold py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            <LogIn className="w-5 h-5" /> {t.loginBtn}
+            {mode === 'signup' ? <UserPlus className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+            {mode === 'signup' ? t.authSignUpBtn : t.authSignInBtn}
           </button>
         </form>
       </div>

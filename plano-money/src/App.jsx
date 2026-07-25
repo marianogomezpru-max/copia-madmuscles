@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB } from './constants.js'
+import { CATEGORIES, CATEGORY_IDS } from './constants.js'
 import { TRANSLATIONS } from './i18n.js'
-import { formatMoney, parseNonNegativeNumber, uid } from './utils/format.js'
+import { formatMoney, parseNonNegativeNumber } from './utils/format.js'
 import { enumerateMonthKeys, getPeriodMonthKeys, getPeriodRange, inRange, isCurrentMonth, monthKey, toISODate } from './utils/periods.js'
+import { supabase } from './lib/supabaseClient.js'
+import { dbApi, fetchHousehold } from './lib/db.js'
 import LoginScreen from './components/LoginScreen.jsx'
+import ResetPasswordScreen from './components/ResetPasswordScreen.jsx'
 import Header from './components/Header.jsx'
 import CoachAlert from './components/CoachAlert.jsx'
 import DashboardView from './components/DashboardView.jsx'
@@ -15,101 +18,95 @@ import SavingsInvestmentsView from './components/SavingsInvestmentsView.jsx'
 
 const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
-// Shallow-merges saved/imported data over DEFAULT_DB so new fields added in
-// later versions (e.g. monthlySnapshots) don't break data saved by an older
-// version of the app, or a backup file exported before that field existed.
-function mergeWithDefaults(parsed) {
-  return { ...DEFAULT_DB, ...parsed, budgets: { ...DEFAULT_DB.budgets, ...parsed.budgets } }
-}
-
-function loadDb() {
-  try {
-    const saved = localStorage.getItem(DB_KEY)
-    if (!saved) return DEFAULT_DB
-    return mergeWithDefaults(JSON.parse(saved))
-  } catch {
-    return DEFAULT_DB
-  }
-}
-
 export default function App() {
-  const [db, setDb] = useState(loadDb)
+  const [session, setSession] = useState(undefined) // undefined = still checking, null = signed out
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
+  const [db, setDb] = useState(null)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [period, setPeriod] = useState('mensual')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [newGoal, setNewGoal] = useState({ name: '', target: '', saved: '' })
 
   useEffect(() => {
-    localStorage.setItem(DB_KEY, JSON.stringify(db))
-  }, [db])
+    supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+      setSession(newSession)
+      if (event === 'SIGNED_OUT') setDb(null)
+    })
+    return () => listener.subscription.unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    if (!session?.user) return
+    fetchHousehold(session.user.id, session.user.email).then(setDb).catch(console.error)
+  }, [session?.user?.id])
 
   // Freeze the outgoing month's plan (fixed income / budgets / savings
   // goal) into monthlySnapshots the first time the app is opened in a new
   // month, so editing those values later never rewrites how past months
-  // are reported. Runs once on load; if the app wasn't opened for several
-  // months, every skipped month gets the same (best-available) snapshot.
+  // are reported.
   useEffect(() => {
+    if (!db || !session?.user) return
     const currentKey = monthKey(toISODate(new Date()))
-    setDb(prev => {
-      if (!prev.lastSeenMonth) return { ...prev, lastSeenMonth: currentKey }
-      if (prev.lastSeenMonth === currentKey) return prev
+    if (db.lastSeenMonth === currentKey) return
 
-      const closedKeys = enumerateMonthKeys(prev.lastSeenMonth, currentKey).slice(0, -1)
-      if (closedKeys.length === 0) return { ...prev, lastSeenMonth: currentKey }
-
-      const snapshot = {
-        fixedIncomes: prev.fixedIncomes.reduce((a, i) => a + i.amount, 0),
-        budgets: { ...prev.budgets },
-        monthlySavingsGoal: prev.monthlySavingsGoal || 0,
+    const patch = { last_seen_month: currentKey }
+    let monthlySnapshots = db.monthlySnapshots
+    if (db.lastSeenMonth) {
+      const closedKeys = enumerateMonthKeys(db.lastSeenMonth, currentKey).slice(0, -1)
+      if (closedKeys.length > 0) {
+        const snapshot = {
+          fixedIncomes: db.fixedIncomes.reduce((a, i) => a + i.amount, 0),
+          budgets: { ...db.budgets },
+          monthlySavingsGoal: db.monthlySavingsGoal || 0,
+        }
+        monthlySnapshots = { ...db.monthlySnapshots }
+        closedKeys.forEach(key => {
+          if (!monthlySnapshots[key]) monthlySnapshots[key] = snapshot
+        })
+        patch.monthly_snapshots = monthlySnapshots
       }
-      const monthlySnapshots = { ...prev.monthlySnapshots }
-      closedKeys.forEach(key => {
-        if (!monthlySnapshots[key]) monthlySnapshots[key] = snapshot
-      })
-      return { ...prev, monthlySnapshots, lastSeenMonth: currentKey }
+    }
+    dbApi.upsertSettings(session.user.id, patch).then(({ error }) => {
+      if (error) return console.error(error)
+      setDb(prev => ({ ...prev, lastSeenMonth: currentKey, monthlySnapshots }))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [db?.lastSeenMonth, session?.user?.id])
 
-  const isLoggedIn = !!db.userProfile
-  const t = TRANSLATIONS[db.language] || TRANSLATIONS.es
-  const activeProfile = db.profiles.find(p => p.id === db.activeProfileId) || null
+  const t = TRANSLATIONS[db?.language] || TRANSLATIONS.es
+  const activeProfile = db?.profiles.find(p => p.id === db.activeProfileId) || null
   const isAdmin = activeProfile?.role === 'admin'
   const visibleCategoryIds = !activeProfile || isAdmin || activeProfile.visibleCategories === null
     ? CATEGORY_IDS
     : activeProfile.visibleCategories
 
-  // Real password verification + reset-by-email need the Supabase backend
-  // (not wired up yet) — for now this only matches/creates a local profile
-  // by email, the same trust model as the previous name-only login.
-  const handleLogin = ({ fullName, email }) => {
-    setDb(prev => {
-      const existing = prev.profiles.find(p => (p.email || '').toLowerCase() === email.toLowerCase())
-      if (existing) {
-        return { ...prev, userProfile: { name: existing.name, email }, activeProfileId: existing.id }
-      }
-      const role = prev.profiles.length === 0 ? 'admin' : 'member'
-      const newProfile = { id: uid(), name: fullName, email, role, visibleCategories: null }
-      return { ...prev, userProfile: { name: fullName, email }, profiles: [...prev.profiles, newProfile], activeProfileId: newProfile.id }
-    })
+  const handleLogout = () => supabase.auth.signOut()
+  const setLanguage = language => {
+    setDb(prev => ({ ...prev, language }))
+    dbApi.upsertSettings(session.user.id, { language }).then(({ error }) => error && console.error(error))
   }
 
-  const handleLogout = () => setDb(prev => ({ ...prev, userProfile: null, activeProfileId: null }))
-  const setLanguage = language => setDb(prev => ({ ...prev, language }))
-
   // Expenses. profileId lets an admin log an expense on behalf of another
-  // household member (regular members can only log their own — the form
-  // only offers the picker to admins) — defaults to whoever's logged in.
-  const addExpense = ({ amount, categoryId, date, note, photo, profileId }) => {
+  // household member — defaults to whoever's logged in.
+  const addExpense = async ({ amount, categoryId, date, note, photo, profileId }) => {
+    const { data, error } = await dbApi.addExpense(session.user.id, {
+      amount, categoryId, date, note, photo, profileId: profileId || db.activeProfileId,
+    })
+    if (error) return console.error(error)
     setDb(prev => ({
       ...prev,
       expenseTransactions: [
         ...prev.expenseTransactions,
-        { id: uid(), amount, categoryId, date, note, photo: photo || null, profileId: profileId || prev.activeProfileId },
+        { id: data.id, amount, categoryId, date, note, photo: photo || null, profileId: profileId || prev.activeProfileId },
       ],
     }))
   }
-  const removeExpense = id => setDb(prev => ({ ...prev, expenseTransactions: prev.expenseTransactions.filter(tx => tx.id !== id) }))
+  const removeExpense = id => {
+    setDb(prev => ({ ...prev, expenseTransactions: prev.expenseTransactions.filter(tx => tx.id !== id) }))
+    dbApi.removeExpense(id).then(({ error }) => error && console.error(error))
+  }
 
   const updateBudget = (categoryId, value) => {
     setDb(prev => {
@@ -118,41 +115,63 @@ export default function App() {
       else budgets[categoryId] = parseNonNegativeNumber(value)
       return { ...prev, budgets }
     })
+    if (value === '') {
+      dbApi.deleteBudget(session.user.id, categoryId).then(({ error }) => error && console.error(error))
+    } else {
+      dbApi.upsertBudget(session.user.id, categoryId, parseNonNegativeNumber(value)).then(({ error }) => error && console.error(error))
+    }
   }
 
   // Income
-  const addFixedIncome = ({ name, amount }) =>
-    setDb(prev => ({ ...prev, fixedIncomes: [...prev.fixedIncomes, { id: uid(), name, amount }] }))
-  const removeFixedIncome = id =>
+  const addFixedIncome = async ({ name, amount }) => {
+    const { data, error } = await dbApi.addFixedIncome(session.user.id, { name, amount })
+    if (error) return console.error(error)
+    setDb(prev => ({ ...prev, fixedIncomes: [...prev.fixedIncomes, { id: data.id, name, amount }] }))
+  }
+  const removeFixedIncome = id => {
     setDb(prev => ({ ...prev, fixedIncomes: prev.fixedIncomes.filter(i => i.id !== id) }))
-  const addVariableIncome = ({ name, amount, date }) =>
-    setDb(prev => ({ ...prev, variableIncomeTransactions: [...prev.variableIncomeTransactions, { id: uid(), name, amount, date }] }))
-  const removeVariableIncome = id =>
+    dbApi.removeFixedIncome(id).then(({ error }) => error && console.error(error))
+  }
+  const addVariableIncome = async ({ name, amount, date }) => {
+    const { data, error } = await dbApi.addVariableIncome(session.user.id, { name, amount, date })
+    if (error) return console.error(error)
+    setDb(prev => ({ ...prev, variableIncomeTransactions: [...prev.variableIncomeTransactions, { id: data.id, name, amount, date }] }))
+  }
+  const removeVariableIncome = id => {
     setDb(prev => ({ ...prev, variableIncomeTransactions: prev.variableIncomeTransactions.filter(i => i.id !== id) }))
+    dbApi.removeVariableIncome(id).then(({ error }) => error && console.error(error))
+  }
 
   // Profiles
-  const addProfile = name => {
-    setDb(prev => {
-      if (prev.profiles.some(p => p.name.toLowerCase() === name.toLowerCase())) return prev
-      return { ...prev, profiles: [...prev.profiles, { id: uid(), name, role: 'member', visibleCategories: null }] }
-    })
+  const addProfile = async name => {
+    if (db.profiles.some(p => p.name.toLowerCase() === name.toLowerCase())) return
+    const { data, error } = await dbApi.addProfile(session.user.id, name)
+    if (error) return console.error(error)
+    setDb(prev => ({ ...prev, profiles: [...prev.profiles, { id: data.id, name, role: 'member', visibleCategories: null }] }))
   }
-  const removeProfile = id => setDb(prev => ({ ...prev, profiles: prev.profiles.filter(p => p.id !== id) }))
+  const removeProfile = id => {
+    setDb(prev => ({ ...prev, profiles: prev.profiles.filter(p => p.id !== id) }))
+    dbApi.removeProfile(id).then(({ error }) => error && console.error(error))
+  }
   const toggleProfileCategory = (profileId, categoryId) => {
-    setDb(prev => ({
-      ...prev,
-      profiles: prev.profiles.map(p => {
+    setDb(prev => {
+      let nextVisible = null
+      const profiles = prev.profiles.map(p => {
         if (p.id !== profileId) return p
         const current = p.visibleCategories === null ? [...CATEGORY_IDS] : [...p.visibleCategories]
-        const next = current.includes(categoryId) ? current.filter(id => id !== categoryId) : [...current, categoryId]
-        return { ...p, visibleCategories: next }
-      }),
-    }))
+        nextVisible = current.includes(categoryId) ? current.filter(id => id !== categoryId) : [...current, categoryId]
+        return { ...p, visibleCategories: nextVisible }
+      })
+      dbApi.setProfileVisibleCategories(profileId, nextVisible).then(({ error }) => error && console.error(error))
+      return { ...prev, profiles }
+    })
   }
 
   // Goals
-  const addGoalDirect = ({ name, target, saved }) => {
-    setDb(prev => ({ ...prev, goals: [...prev.goals, { id: uid(), name, target, saved: saved || 0 }] }))
+  const addGoalDirect = async ({ name, target, saved }) => {
+    const { data, error } = await dbApi.addGoal(session.user.id, { name, target, saved })
+    if (error) return console.error(error)
+    setDb(prev => ({ ...prev, goals: [...prev.goals, { id: data.id, name, target, saved: saved || 0 }] }))
   }
   const addGoal = e => {
     e.preventDefault()
@@ -164,31 +183,49 @@ export default function App() {
       setNewGoal({ name: '', target: '', saved: '' })
     }
   }
-  const removeGoal = id => setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
-  const addGoalContribution = (id, amount) =>
-    setDb(prev => ({
-      ...prev,
-      goals: prev.goals.map(g => (g.id === id ? { ...g, saved: (g.saved || 0) + amount } : g)),
-    }))
+  const removeGoal = id => {
+    setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
+    dbApi.removeGoal(id).then(({ error }) => error && console.error(error))
+  }
+  const addGoalContribution = (id, amount) => {
+    setDb(prev => {
+      const goals = prev.goals.map(g => (g.id === id ? { ...g, saved: (g.saved || 0) + amount } : g))
+      const updated = goals.find(g => g.id === id)
+      dbApi.setGoalSaved(id, updated.saved).then(({ error }) => error && console.error(error))
+      return { ...prev, goals }
+    })
+  }
 
   // Savings & Investments — each entry is dated so contributions can be
   // aggregated per period (mensual/bimestral/trimestral/semestral/anual),
   // the same pattern as expenses and variable income.
-  const addSaving = ({ name, amount }) =>
-    setDb(prev => ({ ...prev, savings: [...prev.savings, { id: uid(), name, amount, date: toISODate(new Date()) }] }))
-  const removeSaving = id => setDb(prev => ({ ...prev, savings: prev.savings.filter(s => s.id !== id) }))
-  const addInvestment = ({ type, name, amount }) =>
-    setDb(prev => ({
-      ...prev,
-      investments: [...prev.investments, { id: uid(), type, name, amount, date: toISODate(new Date()) }],
-    }))
-  const removeInvestment = id => setDb(prev => ({ ...prev, investments: prev.investments.filter(i => i.id !== id) }))
-  const setMonthlySavingsGoal = value => setDb(prev => ({ ...prev, monthlySavingsGoal: parseNonNegativeNumber(value) }))
+  const addSaving = async ({ name, amount }) => {
+    const date = toISODate(new Date())
+    const { data, error } = await dbApi.addSaving(session.user.id, { name, amount, date })
+    if (error) return console.error(error)
+    setDb(prev => ({ ...prev, savings: [...prev.savings, { id: data.id, name, amount, date }] }))
+  }
+  const removeSaving = id => {
+    setDb(prev => ({ ...prev, savings: prev.savings.filter(s => s.id !== id) }))
+    dbApi.removeSaving(id).then(({ error }) => error && console.error(error))
+  }
+  const addInvestment = async ({ type, name, amount }) => {
+    const date = toISODate(new Date())
+    const { data, error } = await dbApi.addInvestment(session.user.id, { type, name, amount, date })
+    if (error) return console.error(error)
+    setDb(prev => ({ ...prev, investments: [...prev.investments, { id: data.id, type, name, amount, date }] }))
+  }
+  const removeInvestment = id => {
+    setDb(prev => ({ ...prev, investments: prev.investments.filter(i => i.id !== id) }))
+    dbApi.removeInvestment(id).then(({ error }) => error && console.error(error))
+  }
+  const setMonthlySavingsGoal = value => {
+    const amount = parseNonNegativeNumber(value)
+    setDb(prev => ({ ...prev, monthlySavingsGoal: amount }))
+    dbApi.upsertSettings(session.user.id, { monthly_savings_goal: amount }).then(({ error }) => error && console.error(error))
+  }
 
   // Human-readable spreadsheet of the user's own data (opens in Excel/Sheets).
-  // This and the PDF export below are the only "download my data" options —
-  // no JSON backup/restore, since that's a technical, easy-to-misuse feature
-  // for an end client (importing the wrong file silently replaces everything).
   const exportCSV = () => {
     const profileName = id => db.profiles.find(p => p.id === id)?.name || ''
     const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`
@@ -288,6 +325,7 @@ export default function App() {
     coachAlerts,
     budgetProgress,
   } = useMemo(() => {
+    if (!db) return {}
     const [start, end] = getPeriodRange(period)
     const visibleTx = db.expenseTransactions.filter(tx => visibleCategoryIds.includes(tx.categoryId))
     const periodTx = visibleTx.filter(tx => inRange(tx.date, start, end))
@@ -377,8 +415,16 @@ export default function App() {
     }
   }, [db, period, visibleCategoryIds, t])
 
-  if (!isLoggedIn) {
-    return <LoginScreen t={t} onLogin={handleLogin} />
+  if (passwordRecovery) {
+    return <ResetPasswordScreen t={t} onDone={() => setPasswordRecovery(false)} />
+  }
+
+  if (session === undefined) {
+    return <div className="w-full min-h-[300px]" />
+  }
+
+  if (!session || !db) {
+    return <LoginScreen t={t} />
   }
 
   return (

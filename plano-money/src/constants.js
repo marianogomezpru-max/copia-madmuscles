@@ -1,5 +1,3 @@
-export const DB_KEY = 'plano_money_db_v4'
-
 // Six clearly distinct hues for the donut chart's 6 category groups — a
 // near-monochrome blue/lila set (tried earlier) made adjacent slices too
 // similar to tell apart, so this goes back to a validated, CVD-safe spread.
@@ -60,25 +58,3 @@ export const PERIODS = ['mensual', 'bimestral', 'trimestral', 'semestral', 'anua
 export const CURRENCY_SYMBOLS = { es: '$', en: '$', pt: 'R$' }
 
 export const INVESTMENT_TYPES = ['plazo_fijo', 'cripto', 'titulos', 'bonos', 'otro']
-
-export const DEFAULT_DB = {
-  userProfile: null,
-  language: 'es',
-  activeProfileId: null,
-  profiles: [],
-  fixedIncomes: [],
-  variableIncomeTransactions: [],
-  expenseTransactions: [],
-  budgets: {},
-  goals: [],
-  savings: [],
-  investments: [],
-  monthlySavingsGoal: 0,
-  // Snapshots of the monthly plan (fixed income / budgets / savings goal) as
-  // of the moment each calendar month closed, keyed "YYYY-MM". Editing
-  // today's values must never retroactively change how a past month is
-  // reported in multi-month periods — lastSeenMonth is how we detect a
-  // month has rolled over so we know when to freeze one.
-  lastSeenMonth: null,
-  monthlySnapshots: {},
-}
