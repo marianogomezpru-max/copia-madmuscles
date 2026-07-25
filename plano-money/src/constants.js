@@ -1,16 +1,15 @@
 export const DB_KEY = 'plano_money_db_v4'
 
-// Six shades within the app's constrained palette (azul oscuro, azul suave,
-// lila, celeste, verde) — chosen for lightness/hue spread so groups stay
-// distinguishable even without color, since the donut always pairs them
-// with a direct label in the legend.
+// Six clearly distinct hues for the donut chart's 6 category groups — a
+// near-monochrome blue/lila set (tried earlier) made adjacent slices too
+// similar to tell apart, so this goes back to a validated, CVD-safe spread.
 export const GROUP_COLORS = {
-  hogar: { light: '#1e3a8a', dark: '#1e3a8a' }, // azul oscuro
-  deudas: { light: '#0ea5e9', dark: '#0ea5e9' }, // celeste
-  movilidad: { light: '#8b5cf6', dark: '#8b5cf6' }, // lila
-  social: { light: '#93c5fd', dark: '#93c5fd' }, // azul suave
-  personal: { light: '#059669', dark: '#059669' }, // verde
-  otros: { light: '#1a1652', dark: '#1a1652' }, // navy profundo
+  hogar: { light: '#2a78d6', dark: '#2a78d6' },
+  deudas: { light: '#eb6834', dark: '#eb6834' },
+  movilidad: { light: '#1baf7a', dark: '#1baf7a' },
+  social: { light: '#eda100', dark: '#eda100' },
+  personal: { light: '#e87ba4', dark: '#e87ba4' },
+  otros: { light: '#008300', dark: '#008300' },
 }
 
 export const GROUPS = ['hogar', 'deudas', 'movilidad', 'social', 'personal', 'otros']
@@ -41,6 +40,18 @@ export const CATEGORIES = [
 ]
 
 export const CATEGORY_IDS = CATEGORIES.map(c => c.id)
+
+// One distinct color per category (not just per group) so expense lists are
+// scannable at a glance — evenly spaced hues, skipping the red band since
+// red is reserved for "at/over budget" risk states elsewhere in the app.
+const RED_BAND_DEGREES = 24
+export const CATEGORY_COLORS = Object.fromEntries(
+  CATEGORIES.map((cat, i) => {
+    const usableSpan = 360 - RED_BAND_DEGREES
+    const hue = Math.round(RED_BAND_DEGREES / 2 + (i * usableSpan) / CATEGORIES.length)
+    return [cat.id, `hsl(${hue}, 62%, 46%)`]
+  }),
+)
 
 export const PERIODS = ['mensual', 'bimestral', 'trimestral', 'semestral', 'anual']
 

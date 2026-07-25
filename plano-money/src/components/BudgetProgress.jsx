@@ -1,11 +1,13 @@
 import { formatMoney } from '../utils/format.js'
+import { CATEGORY_COLORS } from '../constants.js'
 
 // Meter spec: fill carries severity, track is a lighter step of the same
-// ramp. Red is reserved for the one true risk state — at or over budget;
-// the "approaching" tier uses celeste (in-palette) instead of amber.
+// ramp. This is the one place in the app that uses the green/yellow/red
+// traffic light — it's tracking degree of spend against the plan, which is
+// exactly what that convention is for.
 const SEVERITY = {
   good: { fill: '#059669', track: '#d1fae5' },
-  warning: { fill: '#0ea5e9', track: '#dbeef9' },
+  warning: { fill: '#eab308', track: '#fef3c7' },
   critical: { fill: '#d03b3b', track: '#f8dada' },
 }
 
@@ -28,7 +30,10 @@ export default function BudgetProgress({ t, items, lang }) {
         return (
           <div key={item.categoryId}>
             <div className="flex items-center justify-between mb-1 text-xs sm:text-sm">
-              <span className="font-semibold text-slate-700">{t.categories[item.categoryId] || item.categoryId}</span>
+              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: CATEGORY_COLORS[item.categoryId] }} />
+                {t.categories[item.categoryId] || item.categoryId}
+              </span>
               <span className="font-bold text-navy-900">
                 {formatMoney(item.spent, lang)} <span className="text-slate-400 font-normal">/ {formatMoney(item.budget, lang)}</span>
               </span>

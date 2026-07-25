@@ -193,9 +193,22 @@ export default function App() {
       .filter(([cat, budget]) => (monthTotals[cat] || 0) > budget)
       .map(([cat, budget]) => ({ category: t.categories[cat] || cat, diff: Math.round(monthTotals[cat] - budget) }))
 
+    // Presupuesto vs. Real follows the selected period too: the plan (a
+    // monthly budget per category) is summed across the period's months and
+    // compared against what was actually spent in that same period —
+    // matching mensual/bimestral/trimestral/semestral/anual like the rest
+    // of the dashboard, instead of always being pinned to the current month.
+    const periodCategoryTotals = {}
+    periodTx.forEach(tx => {
+      periodCategoryTotals[tx.categoryId] = (periodCategoryTotals[tx.categoryId] || 0) + tx.amount
+    })
     const progress = CATEGORIES
       .filter(cat => db.budgets[cat.id] != null)
-      .map(cat => ({ categoryId: cat.id, spent: monthTotals[cat.id] || 0, budget: db.budgets[cat.id] }))
+      .map(cat => ({
+        categoryId: cat.id,
+        spent: periodCategoryTotals[cat.id] || 0,
+        budget: db.budgets[cat.id] * months,
+      }))
 
     return {
       totalExpenses: expensesSum,

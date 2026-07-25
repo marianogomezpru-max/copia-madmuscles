@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react'
 import TransactionForm from './TransactionForm.jsx'
-import { CATEGORIES, CURRENCY_SYMBOLS } from '../constants.js'
+import { CATEGORIES, CATEGORY_COLORS, CURRENCY_SYMBOLS } from '../constants.js'
 import { formatMoney } from '../utils/format.js'
 
 export default function ExpensesView({ t, db, lang, addExpense, removeExpense, updateBudget }) {
@@ -20,6 +20,10 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
             {sorted.map(tx => (
               <div key={tx.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <div className="flex items-center gap-3 min-w-0">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    style={{ background: CATEGORY_COLORS[tx.categoryId] }}
+                  />
                   {tx.photo && <img src={tx.photo} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0" />}
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -49,8 +53,9 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
         <h3 className="text-base sm:text-lg font-bold text-navy-900 mb-4">{t.budgetsTitle}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {CATEGORIES.map(cat => (
-            <div key={cat.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-              <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">{t.categories[cat.id]}</label>
+            <div key={cat.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full" style={{ background: CATEGORY_COLORS[cat.id] }} />
+              <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5 ml-1.5">{t.categories[cat.id]}</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs font-semibold">
                   {CURRENCY_SYMBOLS[lang] || '$'}
