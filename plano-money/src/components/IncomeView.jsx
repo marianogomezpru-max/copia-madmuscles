@@ -1,0 +1,125 @@
+import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
+import { formatCurrency, parseNonNegativeNumber } from '../utils/format.js'
+import { toISODate } from '../utils/periods.js'
+
+export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedIncome, addVariableIncome, removeVariableIncome }) {
+  const [fixedName, setFixedName] = useState('')
+  const [fixedAmount, setFixedAmount] = useState('')
+  const [varName, setVarName] = useState('')
+  const [varAmount, setVarAmount] = useState('')
+  const [varDate, setVarDate] = useState(toISODate(new Date()))
+
+  const submitFixed = e => {
+    e.preventDefault()
+    const amount = parseNonNegativeNumber(fixedAmount)
+    if (fixedName.trim() && amount > 0) {
+      addFixedIncome({ name: fixedName.trim(), amount })
+      setFixedName('')
+      setFixedAmount('')
+    }
+  }
+
+  const submitVariable = e => {
+    e.preventDefault()
+    const amount = parseNonNegativeNumber(varAmount)
+    if (varName.trim() && amount > 0) {
+      addVariableIncome({ name: varName.trim(), amount, date: varDate })
+      setVarName('')
+      setVarAmount('')
+    }
+  }
+
+  const sortedVariable = [...db.variableIncomeTransactions].sort((a, b) => (a.date < b.date ? 1 : -1))
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.fixedIncomeTitle}</h3>
+        <form onSubmit={submitFixed} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input
+            type="text"
+            placeholder={t.fixedIncomeNamePlaceholder}
+            value={fixedName}
+            onChange={e => setFixedName(e.target.value)}
+            className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 sm:col-span-1"
+          />
+          <input
+            type="number"
+            min="0.01"
+            step="any"
+            placeholder={t.fixedIncomeAmountPlaceholder}
+            value={fixedAmount}
+            onChange={e => setFixedAmount(e.target.value)}
+            className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+          <button type="submit" className="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-sm">
+            {t.addFixedIncomeBtn}
+          </button>
+        </form>
+        <div className="space-y-2">
+          {db.fixedIncomes.length === 0 && <p className="text-center text-sm text-slate-400 py-2">{t.noIncomes}</p>}
+          {db.fixedIncomes.map(inc => (
+            <div key={inc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span className="text-sm font-bold text-slate-800">{inc.name}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-black text-slate-900">${formatCurrency(inc.amount, lang)}/mes</span>
+                <button onClick={() => removeFixedIncome(inc.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.variableIncomeTitle}</h3>
+        <form onSubmit={submitVariable} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+          <input
+            type="text"
+            placeholder={t.variableIncomeNamePlaceholder}
+            value={varName}
+            onChange={e => setVarName(e.target.value)}
+            className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+          <input
+            type="number"
+            min="0.01"
+            step="any"
+            placeholder={t.amountPlaceholder}
+            value={varAmount}
+            onChange={e => setVarAmount(e.target.value)}
+            className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+          <input
+            type="date"
+            value={varDate}
+            onChange={e => setVarDate(e.target.value)}
+            className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+          <button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm">
+            {t.addVariableIncomeBtn}
+          </button>
+        </form>
+        <div className="space-y-2">
+          {sortedVariable.length === 0 && <p className="text-center text-sm text-slate-400 py-2">{t.noIncomes}</p>}
+          {sortedVariable.map(inc => (
+            <div key={inc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <div>
+                <span className="text-sm font-bold text-slate-800">{inc.name}</span>
+                <span className="text-xs text-slate-400 ml-2">{inc.date}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-black text-slate-900">${formatCurrency(inc.amount, lang)}</span>
+                <button onClick={() => removeVariableIncome(inc.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

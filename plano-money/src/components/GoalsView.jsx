@@ -21,6 +21,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, removeG
             <input
               type="number"
               min="1"
+              step="any"
               placeholder={t.goalTargetPlaceholder}
               value={newGoal.target}
               onChange={e => setNewGoal({ ...newGoal, target: e.target.value })}
@@ -29,6 +30,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, removeG
             <input
               type="number"
               min="0"
+              step="any"
               placeholder={t.goalSavedPlaceholder}
               value={newGoal.saved}
               onChange={e => setNewGoal({ ...newGoal, saved: e.target.value })}

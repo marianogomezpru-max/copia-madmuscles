@@ -1,26 +1,25 @@
-import { useEffect, useState } from 'react'
-import { DB_KEY, DEFAULT_DB } from './constants.js'
+import { useEffect, useMemo, useState } from 'react'
+import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB, PERIOD_MONTHS } from './constants.js'
 import { TRANSLATIONS } from './i18n.js'
 import { parseNonNegativeNumber, uid } from './utils/format.js'
+import { getPeriodRange, inRange, isCurrentMonth } from './utils/periods.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import Header from './components/Header.jsx'
 import CoachAlert from './components/CoachAlert.jsx'
 import DashboardView from './components/DashboardView.jsx'
 import ExpensesView from './components/ExpensesView.jsx'
-import FamilyView from './components/FamilyView.jsx'
+import IncomeView from './components/IncomeView.jsx'
+import ProfilesView from './components/ProfilesView.jsx'
 import GoalsView from './components/GoalsView.jsx'
+
+const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
 function loadDb() {
   try {
     const saved = localStorage.getItem(DB_KEY)
     if (!saved) return DEFAULT_DB
     const parsed = JSON.parse(saved)
-    return {
-      ...DEFAULT_DB,
-      ...parsed,
-      expenses: { ...DEFAULT_DB.expenses, ...parsed.expenses },
-      budgets: { ...DEFAULT_DB.budgets, ...parsed.budgets },
-    }
+    return { ...DEFAULT_DB, ...parsed, budgets: { ...DEFAULT_DB.budgets, ...parsed.budgets } }
   } catch {
     return DEFAULT_DB
   }
@@ -29,9 +28,9 @@ function loadDb() {
 export default function App() {
   const [db, setDb] = useState(loadDb)
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [period, setPeriod] = useState('mensual')
   const [loginName, setLoginName] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [newFamilyMemberName, setNewFamilyMemberName] = useState('')
   const [newGoal, setNewGoal] = useState({ name: '', target: '', saved: '' })
 
   useEffect(() => {
@@ -40,57 +39,83 @@ export default function App() {
 
   const isLoggedIn = !!db.userProfile
   const t = TRANSLATIONS[db.language] || TRANSLATIONS.es
+  const activeProfile = db.profiles.find(p => p.id === db.activeProfileId) || null
+  const isAdmin = activeProfile?.role === 'admin'
+  const visibleCategoryIds = !activeProfile || isAdmin || activeProfile.visibleCategories === null
+    ? CATEGORY_IDS
+    : activeProfile.visibleCategories
 
   const handleLogin = e => {
     e.preventDefault()
     const name = loginName.trim()
-    if (name) {
-      setDb(prev => ({ ...prev, userProfile: { name } }))
-      setLoginName('')
-    }
+    if (!name) return
+    setDb(prev => {
+      const existing = prev.profiles.find(p => p.name.toLowerCase() === name.toLowerCase())
+      if (existing) {
+        return { ...prev, userProfile: { name }, activeProfileId: existing.id }
+      }
+      const role = prev.profiles.length === 0 ? 'admin' : 'member'
+      const newProfile = { id: uid(), name, role, visibleCategories: null }
+      return { ...prev, userProfile: { name }, profiles: [...prev.profiles, newProfile], activeProfileId: newProfile.id }
+    })
+    setLoginName('')
   }
 
-  const handleLogout = () => {
-    setDb(prev => ({ ...prev, userProfile: null }))
-  }
-
+  const handleLogout = () => setDb(prev => ({ ...prev, userProfile: null, activeProfileId: null }))
   const setLanguage = language => setDb(prev => ({ ...prev, language }))
 
-  const updateExpense = (key, value) => {
-    setDb(prev => ({ ...prev, expenses: { ...prev.expenses, [key]: parseNonNegativeNumber(value) } }))
+  // Expenses
+  const addExpense = ({ amount, categoryId, date, note, photo }) => {
+    setDb(prev => ({
+      ...prev,
+      expenseTransactions: [
+        ...prev.expenseTransactions,
+        { id: uid(), amount, categoryId, date, note, photo: photo || null, profileId: prev.activeProfileId },
+      ],
+    }))
   }
+  const removeExpense = id => setDb(prev => ({ ...prev, expenseTransactions: prev.expenseTransactions.filter(tx => tx.id !== id) }))
 
-  const updateIncome = value => {
-    setDb(prev => ({ ...prev, income: parseNonNegativeNumber(value) }))
-  }
-
-  // An empty budget means "no budget set" rather than a budget of $0 — otherwise
-  // clearing the field would make the coach flag every category with any spend.
-  const updateBudget = (key, value) => {
+  const updateBudget = (categoryId, value) => {
     setDb(prev => {
       const budgets = { ...prev.budgets }
-      if (value === '') {
-        delete budgets[key]
-      } else {
-        budgets[key] = parseNonNegativeNumber(value)
-      }
+      if (value === '') delete budgets[categoryId]
+      else budgets[categoryId] = parseNonNegativeNumber(value)
       return { ...prev, budgets }
     })
   }
 
-  const addFamilyMember = e => {
-    e.preventDefault()
-    const name = newFamilyMemberName.trim()
-    if (name) {
-      setDb(prev => ({ ...prev, familyMembers: [...prev.familyMembers, { id: uid(), name }] }))
-      setNewFamilyMemberName('')
-    }
+  // Income
+  const addFixedIncome = ({ name, amount }) =>
+    setDb(prev => ({ ...prev, fixedIncomes: [...prev.fixedIncomes, { id: uid(), name, amount }] }))
+  const removeFixedIncome = id =>
+    setDb(prev => ({ ...prev, fixedIncomes: prev.fixedIncomes.filter(i => i.id !== id) }))
+  const addVariableIncome = ({ name, amount, date }) =>
+    setDb(prev => ({ ...prev, variableIncomeTransactions: [...prev.variableIncomeTransactions, { id: uid(), name, amount, date }] }))
+  const removeVariableIncome = id =>
+    setDb(prev => ({ ...prev, variableIncomeTransactions: prev.variableIncomeTransactions.filter(i => i.id !== id) }))
+
+  // Profiles
+  const addProfile = name => {
+    setDb(prev => {
+      if (prev.profiles.some(p => p.name.toLowerCase() === name.toLowerCase())) return prev
+      return { ...prev, profiles: [...prev.profiles, { id: uid(), name, role: 'member', visibleCategories: null }] }
+    })
+  }
+  const removeProfile = id => setDb(prev => ({ ...prev, profiles: prev.profiles.filter(p => p.id !== id) }))
+  const toggleProfileCategory = (profileId, categoryId) => {
+    setDb(prev => ({
+      ...prev,
+      profiles: prev.profiles.map(p => {
+        if (p.id !== profileId) return p
+        const current = p.visibleCategories === null ? [...CATEGORY_IDS] : [...p.visibleCategories]
+        const next = current.includes(categoryId) ? current.filter(id => id !== categoryId) : [...current, categoryId]
+        return { ...p, visibleCategories: next }
+      }),
+    }))
   }
 
-  const removeFamilyMember = id => {
-    setDb(prev => ({ ...prev, familyMembers: prev.familyMembers.filter(m => m.id !== id) }))
-  }
-
+  // Goals
   const addGoal = e => {
     e.preventDefault()
     const name = newGoal.name.trim()
@@ -101,30 +126,50 @@ export default function App() {
       setNewGoal({ name: '', target: '', saved: '' })
     }
   }
+  const removeGoal = id => setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
 
-  const removeGoal = id => {
-    setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
-  }
+  const { totalExpenses, totalIncome, netBalance, totalsByGroup, savingsProgress, coachAlerts } = useMemo(() => {
+    const [start, end] = getPeriodRange(period)
+    const visibleTx = db.expenseTransactions.filter(tx => visibleCategoryIds.includes(tx.categoryId))
+    const periodTx = visibleTx.filter(tx => inRange(tx.date, start, end))
 
-  const totalExpenses = Object.values(db.expenses).reduce((a, b) => a + (Number(b) || 0), 0)
-  const netBalance = db.income - totalExpenses
+    const groupTotals = {}
+    let expensesSum = 0
+    periodTx.forEach(tx => {
+      const group = CATEGORY_GROUP[tx.categoryId] || 'otros'
+      groupTotals[group] = (groupTotals[group] || 0) + tx.amount
+      expensesSum += tx.amount
+    })
 
-  const totalGoalTarget = db.goals.reduce((a, g) => a + (Number(g.target) || 0), 0)
-  const totalGoalSaved = db.goals.reduce((a, g) => a + (Number(g.saved) || 0), 0)
-  const savingsProgress = totalGoalTarget > 0 ? Math.round((totalGoalSaved / totalGoalTarget) * 100) : 0
+    const months = PERIOD_MONTHS[period] || 1
+    const fixedSum = db.fixedIncomes.reduce((a, i) => a + i.amount, 0) * months
+    const variableSum = db.variableIncomeTransactions
+      .filter(i => inRange(i.date, start, end))
+      .reduce((a, i) => a + i.amount, 0)
+    const incomeSum = fixedSum + variableSum
 
-  // Only flags a category when the user set an explicit budget for it and
-  // actual spend exceeds it — no synthetic threshold that would always fire.
-  const getCoachAnalysis = () => {
-    return Object.entries(db.budgets)
-      .filter(([cat, budget]) => (db.expenses[cat] || 0) > budget)
-      .map(([cat, budget]) => ({
-        category: t.categories[cat] || cat,
-        diff: Math.round(db.expenses[cat] - budget),
-      }))
-  }
+    const totalGoalTarget = db.goals.reduce((a, g) => a + (Number(g.target) || 0), 0)
+    const totalGoalSaved = db.goals.reduce((a, g) => a + (Number(g.saved) || 0), 0)
+    const savings = totalGoalTarget > 0 ? Math.round((totalGoalSaved / totalGoalTarget) * 100) : 0
 
-  const coachAlerts = getCoachAnalysis()
+    const monthTotals = {}
+    db.expenseTransactions.forEach(tx => {
+      if (!isCurrentMonth(tx.date)) return
+      monthTotals[tx.categoryId] = (monthTotals[tx.categoryId] || 0) + tx.amount
+    })
+    const alerts = Object.entries(db.budgets)
+      .filter(([cat, budget]) => (monthTotals[cat] || 0) > budget)
+      .map(([cat, budget]) => ({ category: t.categories[cat] || cat, diff: Math.round(monthTotals[cat] - budget) }))
+
+    return {
+      totalExpenses: expensesSum,
+      totalIncome: incomeSum,
+      netBalance: incomeSum - expensesSum,
+      totalsByGroup: groupTotals,
+      savingsProgress: savings,
+      coachAlerts: alerts,
+    }
+  }, [db, period, visibleCategoryIds, t])
 
   if (!isLoggedIn) {
     return <LoginScreen t={t} loginName={loginName} setLoginName={setLoginName} onSubmit={handleLogin} />
@@ -150,39 +195,46 @@ export default function App() {
         {activeTab === 'dashboard' && (
           <DashboardView
             t={t}
-            db={db}
+            period={period}
+            setPeriod={setPeriod}
+            totalIncome={totalIncome}
             totalExpenses={totalExpenses}
             netBalance={netBalance}
             savingsProgress={savingsProgress}
+            totalsByGroup={totalsByGroup}
             lang={db.language}
           />
         )}
 
         {activeTab === 'gastos' && (
-          <ExpensesView t={t} db={db} updateExpense={updateExpense} updateBudget={updateBudget} updateIncome={updateIncome} />
+          <ExpensesView t={t} db={db} lang={db.language} addExpense={addExpense} removeExpense={removeExpense} updateBudget={updateBudget} />
         )}
 
-        {activeTab === 'familia' && (
-          <FamilyView
+        {activeTab === 'ingresos' && (
+          <IncomeView
             t={t}
             db={db}
-            newFamilyMemberName={newFamilyMemberName}
-            setNewFamilyMemberName={setNewFamilyMemberName}
-            addFamilyMember={addFamilyMember}
-            removeFamilyMember={removeFamilyMember}
+            lang={db.language}
+            addFixedIncome={addFixedIncome}
+            removeFixedIncome={removeFixedIncome}
+            addVariableIncome={addVariableIncome}
+            removeVariableIncome={removeVariableIncome}
+          />
+        )}
+
+        {activeTab === 'perfiles' && (
+          <ProfilesView
+            t={t}
+            db={db}
+            isAdmin={isAdmin}
+            addProfile={addProfile}
+            removeProfile={removeProfile}
+            toggleProfileCategory={toggleProfileCategory}
           />
         )}
 
         {activeTab === 'metas' && (
-          <GoalsView
-            t={t}
-            db={db}
-            newGoal={newGoal}
-            setNewGoal={setNewGoal}
-            addGoal={addGoal}
-            removeGoal={removeGoal}
-            lang={db.language}
-          />
+          <GoalsView t={t} db={db} newGoal={newGoal} setNewGoal={setNewGoal} addGoal={addGoal} removeGoal={removeGoal} lang={db.language} />
         )}
       </div>
     </div>
