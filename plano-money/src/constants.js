@@ -55,14 +55,6 @@ export const CATEGORY_COLORS = Object.fromEntries(
 
 export const PERIODS = ['mensual', 'bimestral', 'trimestral', 'semestral', 'anual']
 
-export const PERIOD_MONTHS = {
-  mensual: 1,
-  bimestral: 2,
-  trimestral: 3,
-  semestral: 6,
-  anual: 12,
-}
-
 export const CURRENCY_SYMBOLS = { es: '$', en: '$', pt: 'R$' }
 
 export const INVESTMENT_TYPES = ['plazo_fijo', 'cripto', 'titulos', 'bonos', 'otro']

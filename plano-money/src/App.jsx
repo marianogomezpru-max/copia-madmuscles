@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB, PERIOD_MONTHS } from './constants.js'
+import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB } from './constants.js'
 import { TRANSLATIONS } from './i18n.js'
 import { parseNonNegativeNumber, uid } from './utils/format.js'
-import { getPeriodRange, inRange, isCurrentMonth, toISODate } from './utils/periods.js'
+import { getPeriodMonthCount, getPeriodRange, inRange, isCurrentMonth, toISODate } from './utils/periods.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import Header from './components/Header.jsx'
 import CoachAlert from './components/CoachAlert.jsx'
@@ -167,7 +167,7 @@ export default function App() {
       expensesSum += tx.amount
     })
 
-    const months = PERIOD_MONTHS[period] || 1
+    const months = getPeriodMonthCount(period)
     const fixedSum = db.fixedIncomes.reduce((a, i) => a + i.amount, 0) * months
     const variableSum = db.variableIncomeTransactions
       .filter(i => inRange(i.date, start, end))
