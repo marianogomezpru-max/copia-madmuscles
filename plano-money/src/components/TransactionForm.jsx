@@ -1,8 +1,6 @@
-import { useRef, useState } from 'react'
-import { Camera } from 'lucide-react'
+import { useState } from 'react'
 import { CATEGORIES, GROUPS } from '../constants.js'
 import { parseExpensePhrase } from '../utils/speech.js'
-import { compressImageFile } from '../utils/image.js'
 import { formatMoney } from '../utils/format.js'
 import { toISODate } from '../utils/periods.js'
 import VoiceButton from './VoiceButton.jsx'
@@ -13,15 +11,12 @@ export default function TransactionForm({ t, lang, onAdd, profiles, activeProfil
   const [categoryId, setCategoryId] = useState(CATEGORIES[0].id)
   const [date, setDate] = useState(toISODate(new Date()))
   const [note, setNote] = useState('')
-  const [photo, setPhoto] = useState(null)
   const [voiceMessage, setVoiceMessage] = useState(null)
   const [profileId, setProfileId] = useState(activeProfileId || '')
-  const fileInputRef = useRef(null)
 
   const reset = () => {
     setAmount('')
     setNote('')
-    setPhoto(null)
     setDate(toISODate(new Date()))
   }
 
@@ -29,7 +24,7 @@ export default function TransactionForm({ t, lang, onAdd, profiles, activeProfil
     e.preventDefault()
     const num = Number(amount)
     if (!Number.isFinite(num) || num <= 0) return
-    onAdd({ amount: num, categoryId, date, note: note.trim(), photo, profileId: profileId || activeProfileId })
+    onAdd({ amount: num, categoryId, date, note: note.trim(), photo: null, profileId: profileId || activeProfileId })
     reset()
   }
 
@@ -52,38 +47,14 @@ export default function TransactionForm({ t, lang, onAdd, profiles, activeProfil
     }
   }
 
-  const handlePhoto = async e => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const dataUrl = await compressImageFile(file)
-    setPhoto(dataUrl)
-  }
-
   return (
     <form onSubmit={handleSubmit} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <h3 className="text-base sm:text-lg font-bold text-navy-900">{t.newTransactionTitle}</h3>
-        <div className="flex gap-2">
-          <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border bg-purple-50 border-purple-100 text-purple-700 hover:bg-purple-100 transition-colors"
-          >
-            <Camera className="w-3.5 h-3.5" /> {photo ? t.photoAttached : t.photoBtn}
-          </button>
-          <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} className="hidden" />
-        </div>
+        <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
       </div>
 
       <VoiceConfirmationBanner message={voiceMessage} />
-
-      {photo && (
-        <div className="flex items-center gap-3">
-          <img src={photo} alt="" className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
-          <p className="text-xs text-slate-400">{t.photoAiNote}</p>
-        </div>
-      )}
 
       {profiles && profiles.length > 1 && (
         <div>

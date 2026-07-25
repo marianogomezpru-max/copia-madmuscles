@@ -27,6 +27,7 @@ export const CATEGORIES = [
   { id: 'deuda_otra', group: 'deudas' },
   { id: 'seguros', group: 'movilidad' },
   { id: 'mantenimiento_vehiculo', group: 'movilidad' },
+  { id: 'salud', group: 'personal' },
   { id: 'educacion', group: 'personal' },
   { id: 'restaurantes', group: 'social' },
   { id: 'reuniones', group: 'social' },

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB } from './constants.js'
 import { TRANSLATIONS } from './i18n.js'
-import { parseNonNegativeNumber, uid } from './utils/format.js'
+import { formatMoney, parseNonNegativeNumber, uid } from './utils/format.js'
 import { enumerateMonthKeys, getPeriodMonthKeys, getPeriodRange, inRange, isCurrentMonth, monthKey, toISODate } from './utils/periods.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import Header from './components/Header.jsx'
@@ -180,23 +180,10 @@ export default function App() {
   const removeInvestment = id => setDb(prev => ({ ...prev, investments: prev.investments.filter(i => i.id !== id) }))
   const setMonthlySavingsGoal = value => setDb(prev => ({ ...prev, monthlySavingsGoal: parseNonNegativeNumber(value) }))
 
-  // Manual JSON backup: a safety net against data loss (device change,
-  // browser data cleared, etc.) and the mechanism for "download my data and
-  // start fresh next year" — not a substitute for real backend-backed
-  // durability, which needs the Supabase backend that isn't built yet.
-  const exportData = () => {
-    const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `plano-money-backup-${toISODate(new Date())}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  // Human-readable spreadsheet of the user's own data (opens in Excel/Sheets)
-  // — separate from the JSON backup above, which is a full app-state dump
-  // meant only for restoring into Plano.Money itself.
+  // Human-readable spreadsheet of the user's own data (opens in Excel/Sheets).
+  // This and the PDF export below are the only "download my data" options —
+  // no JSON backup/restore, since that's a technical, easy-to-misuse feature
+  // for an end client (importing the wrong file silently replaces everything).
   const exportCSV = () => {
     const profileName = id => db.profiles.find(p => p.id === id)?.name || ''
     const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`
@@ -243,22 +230,46 @@ export default function App() {
     URL.revokeObjectURL(url)
   }
 
-  const importData = file => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(reader.result)
-        if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.expenseTransactions)) {
-          throw new Error('invalid backup shape')
-        }
-        if (!window.confirm(t.importConfirm)) return
-        setDb(mergeWithDefaults(parsed))
-        alert(t.importSuccess)
-      } catch {
-        alert(t.importError)
-      }
-    }
-    reader.readAsText(file)
+  // Printable PDF-style report — built as an HTML page and handed to the
+  // browser's own print dialog ("Save as PDF"), no PDF library needed.
+  const exportPDF = () => {
+    const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+    const profileName = id => db.profiles.find(p => p.id === id)?.name || ''
+    const section = (title, headers, rows) => rows.length === 0 ? '' : `
+      <h2>${esc(title)}</h2>
+      <table>
+        <thead><tr>${headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table>`
+
+    const html = `<!doctype html>
+      <html><head><meta charset="utf-8"><title>Plano.Money — ${esc(db.userProfile?.name || '')}</title>
+      <style>
+        body { font-family: Arial, sans-serif; color: #1e1b4b; padding: 24px; }
+        h1 { margin-bottom: 0; } .subtitle { color: #64748b; margin-top: 4px; }
+        h2 { margin-top: 28px; border-bottom: 2px solid #312e81; padding-bottom: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+        th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; }
+      </style></head>
+      <body>
+        <h1>Plano.Money</h1>
+        <p class="subtitle">${esc(db.userProfile?.name || '')} · ${esc(toISODate(new Date()))}</p>
+        ${section(t.csvSectionExpenses, [t.datePlaceholder, t.categoryPlaceholder, t.csvAmount, t.csvNote, t.csvProfile],
+          db.expenseTransactions.map(tx => [tx.date, t.categories[tx.categoryId] || tx.categoryId, formatMoney(tx.amount, db.language), tx.note || '', profileName(tx.profileId)]))}
+        ${section(t.csvSectionFixedIncome, [t.csvName, t.csvAmount], db.fixedIncomes.map(i => [i.name, formatMoney(i.amount, db.language)]))}
+        ${section(t.csvSectionVariableIncome, [t.datePlaceholder, t.csvName, t.csvAmount], db.variableIncomeTransactions.map(i => [i.date, i.name, formatMoney(i.amount, db.language)]))}
+        ${section(t.csvSectionSavings, [t.csvName, t.csvAmount], db.savings.map(s => [s.name, formatMoney(s.amount, db.language)]))}
+        ${section(t.csvSectionInvestments, [t.csvType, t.csvName, t.csvAmount], db.investments.map(i => [t.investmentTypes[i.type] || i.type, i.name, formatMoney(i.amount, db.language)]))}
+        ${section(t.csvSectionGoals, [t.csvName, t.csvTarget, t.csvSaved], db.goals.map(g => [g.name, formatMoney(g.target, db.language), formatMoney(g.saved, db.language)]))}
+      </body></html>`
+
+    const win = window.open('', '_blank')
+    if (!win) return
+    win.document.write(html)
+    win.document.close()
+    win.focus()
+    win.print()
   }
 
   const {
@@ -377,9 +388,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
-        onExportData={exportData}
-        onImportData={importData}
         onExportCSV={exportCSV}
+        onExportPDF={exportPDF}
       />
 
       <div className="p-4 sm:p-6 space-y-6">

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PiggyBank, TrendingUp, Trash2 } from 'lucide-react'
+import { PiggyBank, Target, TrendingUp, Trash2 } from 'lucide-react'
 import { formatMoney, parseNonNegativeNumber } from '../utils/format.js'
 import { parseAmountAndLabel } from '../utils/speech.js'
 import { CURRENCY_SYMBOLS, INVESTMENT_TYPES } from '../constants.js'
@@ -34,6 +34,8 @@ export default function SavingsInvestmentsView({
     db.savings.reduce((a, s) => a + s.amount, 0) +
     db.investments.reduce((a, i) => a + i.amount, 0) +
     db.goals.reduce((a, g) => a + (g.saved || 0), 0)
+
+  const goalsWithSavings = db.goals.filter(g => (g.saved || 0) > 0)
 
   const submitSaving = e => {
     e.preventDefault()
@@ -93,6 +95,28 @@ export default function SavingsInvestmentsView({
         </div>
         <p className="text-xs text-white/60 mt-2">{t.totalPatrimonioHint}</p>
       </div>
+
+      {goalsWithSavings.length > 0 && (
+        <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <h3 className="text-base sm:text-lg font-bold text-navy-900 flex items-center gap-2 mb-3">
+            <Target className="w-5 h-5 text-lila-500" /> {t.goalContributionsTitle}
+          </h3>
+          <div className="space-y-2">
+            {goalsWithSavings.map(g => (
+              <div key={g.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-lila-500/10 text-lila-600 shrink-0">
+                    {t.goalLabel}
+                  </span>
+                  <span className="text-sm font-bold text-slate-800 truncate">{g.name}</span>
+                </div>
+                <span className="text-sm font-black text-navy-900 shrink-0">{formatMoney(g.saved, lang)}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-400 mt-2">{t.goalContributionsHint}</p>
+        </div>
+      )}
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
         <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">{t.monthlySavingsGoalLabel}</label>

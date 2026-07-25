@@ -1,5 +1,4 @@
-import { useRef } from 'react'
-import { Download, FileSpreadsheet, Globe, LogOut, Menu, Upload, X } from 'lucide-react'
+import { FileSpreadsheet, FileText, Globe, LogOut, Menu, X } from 'lucide-react'
 import Logo from './Logo.jsx'
 
 export default function Header({
@@ -12,18 +11,9 @@ export default function Header({
   setActiveTab,
   mobileMenuOpen,
   setMobileMenuOpen,
-  onExportData,
-  onImportData,
   onExportCSV,
+  onExportPDF,
 }) {
-  const fileInputRef = useRef(null)
-
-  const handleFileChange = e => {
-    const file = e.target.files?.[0]
-    if (file) onImportData(file)
-    e.target.value = ''
-  }
-
   return (
     <>
       <div className="bg-navy-900 text-white px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-3 border-b border-navy-800">
@@ -60,23 +50,13 @@ export default function Header({
           </button>
 
           <button
-            onClick={onExportData}
-            aria-label={t.exportDataBtn}
-            title={t.exportDataBtn}
+            onClick={onExportPDF}
+            aria-label={t.exportPdfBtn}
+            title={t.exportPdfBtn}
             className="flex items-center gap-1 bg-navy-800 hover:bg-navy-700 text-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border border-navy-700 shrink-0"
           >
-            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            aria-label={t.importDataBtn}
-            title={t.importDataBtn}
-            className="flex items-center gap-1 bg-navy-800 hover:bg-navy-700 text-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border border-navy-700 shrink-0"
-          >
-            <Upload className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-          <input ref={fileInputRef} type="file" accept="application/json" onChange={handleFileChange} className="hidden" />
 
           <button
             onClick={onLogout}
