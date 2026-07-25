@@ -12,6 +12,7 @@ export default function LoginScreen({ t, lang }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [inviteCode, setInviteCode] = useState('')
+  const [accessCode, setAccessCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -24,12 +25,20 @@ export default function LoginScreen({ t, lang }) {
     try {
       if (mode === 'signup') {
         const trimmedCode = inviteCode.trim()
+        const trimmedAccessCode = accessCode.trim()
+        if (!trimmedCode && !trimmedAccessCode) {
+          setError(t.accessOrInviteRequiredError)
+          return
+        }
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
           password,
-          options: { data: { full_name: fullName.trim() } },
+          options: { data: { full_name: fullName.trim(), invite_code: trimmedCode || null, access_code: trimmedAccessCode || null } },
         })
-        if (signUpError) throw signUpError
+        if (signUpError) {
+          setError(trimmedAccessCode ? t.accessCodeInvalidError : signUpError.message)
+          return
+        }
 
         if (!data.session) {
           // Confirming the email happens outside this tab, so there's no
@@ -129,6 +138,18 @@ export default function LoginScreen({ t, lang }) {
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
               />
               <p className="text-xs text-slate-400 mt-1 ml-1">{t.inviteCodeFieldHint}</p>
+            </div>
+          )}
+          {mode === 'signup' && (
+            <div className="text-left">
+              <input
+                type="text"
+                value={accessCode}
+                onChange={e => setAccessCode(e.target.value)}
+                placeholder={t.accessCodeFieldPlaceholder}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
+              />
+              <p className="text-xs text-slate-400 mt-1 ml-1">{t.accessCodeFieldHint}</p>
             </div>
           )}
           <div className="text-left">
