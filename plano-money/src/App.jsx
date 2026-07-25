@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB } from './constants.js'
 import { TRANSLATIONS } from './i18n.js'
 import { parseNonNegativeNumber, uid } from './utils/format.js'
-import { getPeriodMonthCount, getPeriodRange, inRange, isCurrentMonth, toISODate } from './utils/periods.js'
+import { enumerateMonthKeys, getPeriodMonthKeys, getPeriodRange, inRange, isCurrentMonth, monthKey, toISODate } from './utils/periods.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import Header from './components/Header.jsx'
 import CoachAlert from './components/CoachAlert.jsx'
@@ -15,12 +15,18 @@ import SavingsInvestmentsView from './components/SavingsInvestmentsView.jsx'
 
 const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
+// Shallow-merges saved/imported data over DEFAULT_DB so new fields added in
+// later versions (e.g. monthlySnapshots) don't break data saved by an older
+// version of the app, or a backup file exported before that field existed.
+function mergeWithDefaults(parsed) {
+  return { ...DEFAULT_DB, ...parsed, budgets: { ...DEFAULT_DB.budgets, ...parsed.budgets } }
+}
+
 function loadDb() {
   try {
     const saved = localStorage.getItem(DB_KEY)
     if (!saved) return DEFAULT_DB
-    const parsed = JSON.parse(saved)
-    return { ...DEFAULT_DB, ...parsed, budgets: { ...DEFAULT_DB.budgets, ...parsed.budgets } }
+    return mergeWithDefaults(JSON.parse(saved))
   } catch {
     return DEFAULT_DB
   }
@@ -36,6 +42,34 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem(DB_KEY, JSON.stringify(db))
   }, [db])
+
+  // Freeze the outgoing month's plan (fixed income / budgets / savings
+  // goal) into monthlySnapshots the first time the app is opened in a new
+  // month, so editing those values later never rewrites how past months
+  // are reported. Runs once on load; if the app wasn't opened for several
+  // months, every skipped month gets the same (best-available) snapshot.
+  useEffect(() => {
+    const currentKey = monthKey(toISODate(new Date()))
+    setDb(prev => {
+      if (!prev.lastSeenMonth) return { ...prev, lastSeenMonth: currentKey }
+      if (prev.lastSeenMonth === currentKey) return prev
+
+      const closedKeys = enumerateMonthKeys(prev.lastSeenMonth, currentKey).slice(0, -1)
+      if (closedKeys.length === 0) return { ...prev, lastSeenMonth: currentKey }
+
+      const snapshot = {
+        fixedIncomes: prev.fixedIncomes.reduce((a, i) => a + i.amount, 0),
+        budgets: { ...prev.budgets },
+        monthlySavingsGoal: prev.monthlySavingsGoal || 0,
+      }
+      const monthlySnapshots = { ...prev.monthlySnapshots }
+      closedKeys.forEach(key => {
+        if (!monthlySnapshots[key]) monthlySnapshots[key] = snapshot
+      })
+      return { ...prev, monthlySnapshots, lastSeenMonth: currentKey }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const isLoggedIn = !!db.userProfile
   const t = TRANSLATIONS[db.language] || TRANSLATIONS.es
@@ -144,6 +178,38 @@ export default function App() {
   const removeInvestment = id => setDb(prev => ({ ...prev, investments: prev.investments.filter(i => i.id !== id) }))
   const setMonthlySavingsGoal = value => setDb(prev => ({ ...prev, monthlySavingsGoal: parseNonNegativeNumber(value) }))
 
+  // Manual JSON backup: a safety net against data loss (device change,
+  // browser data cleared, etc.) and the mechanism for "download my data and
+  // start fresh next year" — not a substitute for real backend-backed
+  // durability, which needs the Supabase backend that isn't built yet.
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `plano-money-backup-${toISODate(new Date())}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const importData = file => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result)
+        if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.expenseTransactions)) {
+          throw new Error('invalid backup shape')
+        }
+        if (!window.confirm(t.importConfirm)) return
+        setDb(mergeWithDefaults(parsed))
+        alert(t.importSuccess)
+      } catch {
+        alert(t.importError)
+      }
+    }
+    reader.readAsText(file)
+  }
+
   const {
     totalExpenses,
     totalIncome,
@@ -167,8 +233,29 @@ export default function App() {
       expensesSum += tx.amount
     })
 
-    const months = getPeriodMonthCount(period)
-    const fixedSum = db.fixedIncomes.reduce((a, i) => a + i.amount, 0) * months
+    // Income can change month to month, so a multi-month period must sum
+    // what was actually in effect for each of its months, not today's
+    // current value × month count. Closed months (before the current one)
+    // pull from their frozen monthlySnapshots entry when one exists; the
+    // current month, and any future months still inside the same calendar
+    // block, use the live value since they haven't closed yet.
+    const currentKey = monthKey(toISODate(new Date()))
+    const periodMonthKeys = getPeriodMonthKeys(period)
+    const liveFixedTotal = db.fixedIncomes.reduce((a, i) => a + i.amount, 0)
+
+    let fixedSum = 0
+    let savingsGoalSum = 0
+    const budgetSumByCategory = {}
+    periodMonthKeys.forEach(key => {
+      const snap = key < currentKey ? db.monthlySnapshots[key] : null
+      fixedSum += snap ? snap.fixedIncomes : liveFixedTotal
+      savingsGoalSum += snap ? snap.monthlySavingsGoal : (db.monthlySavingsGoal || 0)
+      const monthBudgets = snap ? snap.budgets : db.budgets
+      Object.entries(monthBudgets).forEach(([catId, amount]) => {
+        budgetSumByCategory[catId] = (budgetSumByCategory[catId] || 0) + amount
+      })
+    })
+
     const variableSum = db.variableIncomeTransactions
       .filter(i => inRange(i.date, start, end))
       .reduce((a, i) => a + i.amount, 0)
@@ -178,7 +265,7 @@ export default function App() {
     // investments contributions) vs. the monthly savings goal scaled to the
     // selected period — not the Metas goals, which have their own per-goal
     // progress bars in the Metas tab.
-    const periodSavingsGoal = (db.monthlySavingsGoal || 0) * months
+    const periodSavingsGoal = savingsGoalSum
     const savedInPeriod =
       db.savings.filter(s => inRange(s.date, start, end)).reduce((a, s) => a + s.amount, 0) +
       db.investments.filter(i => inRange(i.date, start, end)).reduce((a, i) => a + i.amount, 0)
@@ -207,7 +294,7 @@ export default function App() {
       .map(cat => ({
         categoryId: cat.id,
         spent: periodCategoryTotals[cat.id] || 0,
-        budget: db.budgets[cat.id] * months,
+        budget: budgetSumByCategory[cat.id] || 0,
       }))
 
     return {
@@ -239,6 +326,8 @@ export default function App() {
         setActiveTab={setActiveTab}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
+        onExportData={exportData}
+        onImportData={importData}
       />
 
       <div className="p-4 sm:p-6 space-y-6">

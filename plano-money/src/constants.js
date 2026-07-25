@@ -72,4 +72,11 @@ export const DEFAULT_DB = {
   savings: [],
   investments: [],
   monthlySavingsGoal: 0,
+  // Snapshots of the monthly plan (fixed income / budgets / savings goal) as
+  // of the moment each calendar month closed, keyed "YYYY-MM". Editing
+  // today's values must never retroactively change how a past month is
+  // reported in multi-month periods — lastSeenMonth is how we detect a
+  // month has rolled over so we know when to freeze one.
+  lastSeenMonth: null,
+  monthlySnapshots: {},
 }

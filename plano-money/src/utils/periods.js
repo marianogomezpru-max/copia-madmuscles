@@ -53,3 +53,35 @@ export function isCurrentMonth(dateStr, refDate = new Date()) {
   const [start, end] = getPeriodRange('mensual', refDate)
   return inRange(dateStr, start, end)
 }
+
+// "YYYY-MM" from an ISO date string ("YYYY-MM-DD") — the key used for
+// db.monthlySnapshots and db.lastSeenMonth.
+export function monthKey(dateStr) {
+  return dateStr.slice(0, 7)
+}
+
+// All "YYYY-MM" keys from startKey to endKey, inclusive.
+export function enumerateMonthKeys(startKey, endKey) {
+  const [sy, sm] = startKey.split('-').map(Number)
+  const [ey, em] = endKey.split('-').map(Number)
+  const keys = []
+  let y = sy
+  let m = sm
+  while (y < ey || (y === ey && m <= em)) {
+    keys.push(`${y}-${String(m).padStart(2, '0')}`)
+    m += 1
+    if (m > 12) {
+      m = 1
+      y += 1
+    }
+  }
+  return keys
+}
+
+// Every "YYYY-MM" key covered by a period (including calendar-block months
+// still in the future, e.g. March in a Jan-Mar trimestre viewed in
+// February) — used to walk month-by-month through snapshots vs. live values.
+export function getPeriodMonthKeys(period, refDate = new Date()) {
+  const [start, end] = getPeriodRange(period, refDate)
+  return enumerateMonthKeys(monthKey(start), monthKey(end))
+}
