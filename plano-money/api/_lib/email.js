@@ -10,10 +10,12 @@ export async function sendAccessCodeEmail({ to, code }) {
   }
 
   const baseUrl = process.env.APP_URL || 'https://plano-money.vercel.app'
-  // One-click link: LoginScreen reads ?access_code= on load, switches
-  // straight to the signup form and pre-fills the code — the customer
-  // only has to add their name/email/password, not copy-paste anything.
-  const signupUrl = `${baseUrl}/?access_code=${encodeURIComponent(code)}`
+  // One-click link: LoginScreen reads ?access_code=&email= on load, switches
+  // straight to the signup form and pre-fills both — the code can only be
+  // redeemed under this same email (enforced server-side), so pre-filling
+  // it here isn't just convenience, it steers the customer to the email
+  // that will actually work.
+  const signupUrl = `${baseUrl}/?access_code=${encodeURIComponent(code)}&email=${encodeURIComponent(to)}`
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

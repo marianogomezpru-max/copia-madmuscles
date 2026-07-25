@@ -7,19 +7,21 @@ import { joinHousehold } from '../lib/db.js'
 import { PENDING_JOIN_KEY } from '../lib/pendingJoin.js'
 
 // A "Crear mi cuenta" link from the access-code email lands here with
-// ?access_code=... — jump straight to signup with it pre-filled instead
-// of making the customer copy-paste it from the email by hand.
-function accessCodeFromUrl() {
-  return new URLSearchParams(window.location.search).get('access_code') || ''
+// ?access_code=...&email=... — jump straight to signup with both
+// pre-filled instead of making the customer copy-paste them by hand. The
+// email has to match what the code was issued for anyway (enforced
+// server-side), so pre-filling it steers them to the one that'll work.
+function paramFromUrl(name) {
+  return new URLSearchParams(window.location.search).get(name) || ''
 }
 
 export default function LoginScreen({ t, lang }) {
-  const [mode, setMode] = useState(() => (accessCodeFromUrl() ? 'signup' : 'signin'))
+  const [mode, setMode] = useState(() => (paramFromUrl('access_code') ? 'signup' : 'signin'))
   const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(() => paramFromUrl('email'))
   const [password, setPassword] = useState('')
   const [inviteCode, setInviteCode] = useState('')
-  const [accessCode, setAccessCode] = useState(accessCodeFromUrl)
+  const [accessCode, setAccessCode] = useState(() => paramFromUrl('access_code'))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
