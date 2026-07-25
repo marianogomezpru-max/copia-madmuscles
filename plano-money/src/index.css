@@ -26,3 +26,26 @@ input[type='number']::-webkit-outer-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
 }
+
+/* Thin, low-profile scrollbar for scrollable panels (e.g. Presupuesto vs.
+   Real) — the browser-default scrollbar has bulky up/down arrow buttons
+   that look out of place next to the app's own scroll-hint chevron. */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}

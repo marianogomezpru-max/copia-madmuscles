@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { formatMoney } from '../utils/format.js'
 import { CATEGORY_COLORS } from '../constants.js'
 
@@ -18,13 +20,29 @@ function severityFor(pct) {
 }
 
 export default function BudgetProgress({ t, items, lang }) {
+  const scrollRef = useRef(null)
+  const [canScrollDown, setCanScrollDown] = useState(false)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const update = () => setCanScrollDown(el.scrollHeight - el.scrollTop - el.clientHeight > 4)
+    update()
+    el.addEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    return () => {
+      el.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [items])
+
   if (items.length === 0) {
     return <p className="text-center text-sm text-slate-400 py-4">{t.noBudgetsSet}</p>
   }
 
   return (
     <div className="relative">
-      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+      <div ref={scrollRef} className="scrollbar-thin space-y-3 max-h-80 overflow-y-auto pr-2">
         {items.map(item => {
           // No budget set for a category that still has spending shows as
           // maxed-out red — that's the useful signal ("gastaste sin plan"),
@@ -55,8 +73,10 @@ export default function BudgetProgress({ t, items, lang }) {
           )
         })}
       </div>
-      {items.length > 4 && (
-        <div className="pointer-events-none absolute bottom-0 left-0 right-1 h-6 bg-gradient-to-t from-white to-transparent" />
+      {canScrollDown && (
+        <div className="pointer-events-none absolute bottom-0 left-0 right-2 h-8 bg-gradient-to-t from-white to-transparent flex items-end justify-center">
+          <ChevronDown className="w-4 h-4 text-slate-400 animate-bounce mb-0.5" />
+        </div>
       )}
     </div>
   )
