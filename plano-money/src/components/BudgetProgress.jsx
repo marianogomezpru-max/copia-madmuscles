@@ -23,30 +23,41 @@ export default function BudgetProgress({ t, items, lang }) {
   }
 
   return (
-    <div className="space-y-3">
-      {items.map(item => {
-        const pct = item.budget > 0 ? (item.spent / item.budget) * 100 : 0
-        const severity = SEVERITY[severityFor(pct)]
-        return (
-          <div key={item.categoryId}>
-            <div className="flex items-center justify-between mb-1 text-xs sm:text-sm">
-              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: CATEGORY_COLORS[item.categoryId] }} />
-                {t.categories[item.categoryId] || item.categoryId}
-              </span>
-              <span className="font-bold text-navy-900">
-                {formatMoney(item.spent, lang)} <span className="text-slate-400 font-normal">/ {formatMoney(item.budget, lang)}</span>
-              </span>
+    <div className="relative">
+      <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+        {items.map(item => {
+          // No budget set for a category that still has spending shows as
+          // maxed-out red — that's the useful signal ("gastaste sin plan"),
+          // not a silently-green 0%.
+          const pct = item.budget > 0 ? (item.spent / item.budget) * 100 : item.spent > 0 ? 999 : 0
+          const severity = SEVERITY[severityFor(pct)]
+          return (
+            <div key={item.categoryId}>
+              <div className="flex items-center justify-between mb-1 text-xs sm:text-sm">
+                <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: CATEGORY_COLORS[item.categoryId] }} />
+                  {t.categories[item.categoryId] || item.categoryId}
+                </span>
+                <span className="font-bold text-navy-900">
+                  {formatMoney(item.spent, lang)}{' '}
+                  <span className="text-slate-400 font-normal">
+                    / {item.budget > 0 ? formatMoney(item.budget, lang) : t.noBudget}
+                  </span>
+                </span>
+              </div>
+              <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: severity.track }}>
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(100, pct)}%`, background: severity.fill }}
+                />
+              </div>
             </div>
-            <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: severity.track }}>
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, pct)}%`, background: severity.fill }}
-              />
-            </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
+      {items.length > 4 && (
+        <div className="pointer-events-none absolute bottom-0 left-0 right-1 h-6 bg-gradient-to-t from-white to-transparent" />
+      )}
     </div>
   )
 }

@@ -341,7 +341,7 @@ export default function App() {
       periodCategoryTotals[tx.categoryId] = (periodCategoryTotals[tx.categoryId] || 0) + tx.amount
     })
     const progress = CATEGORIES
-      .filter(cat => db.budgets[cat.id] != null)
+      .filter(cat => db.budgets[cat.id] != null || (periodCategoryTotals[cat.id] || 0) > 0)
       .map(cat => ({
         categoryId: cat.id,
         spent: periodCategoryTotals[cat.id] || 0,
