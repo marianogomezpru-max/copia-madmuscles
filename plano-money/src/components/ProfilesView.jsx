@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { Trash2, Users } from 'lucide-react'
 import { CATEGORIES, GROUPS } from '../constants.js'
+import VoiceButton from './VoiceButton.jsx'
+import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
 
-export default function ProfilesView({ t, db, isAdmin, addProfile, removeProfile, toggleProfileCategory }) {
+export default function ProfilesView({ t, db, lang, isAdmin, addProfile, removeProfile, toggleProfileCategory }) {
   const [name, setName] = useState('')
+  const [voiceMsg, setVoiceMsg] = useState(null)
 
   const submit = e => {
     e.preventDefault()
@@ -13,13 +16,25 @@ export default function ProfilesView({ t, db, isAdmin, addProfile, removeProfile
     }
   }
 
+  const handleTranscript = phrase => {
+    const cleanName = phrase.trim()
+    if (!cleanName) return
+    addProfile(cleanName)
+    setVoiceMsg(cleanName)
+    setTimeout(() => setVoiceMsg(null), 4000)
+  }
+
   return (
     <div className="space-y-6 animate-fade-in max-w-3xl mx-auto">
       {isAdmin && (
         <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-            <Users className="w-5 h-5 text-brand-500" /> {t.addProfileTitle}
-          </h3>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+              <Users className="w-5 h-5 text-brand-500" /> {t.addProfileTitle}
+            </h3>
+            <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
+          </div>
+          <VoiceConfirmationBanner message={voiceMsg} />
           <form onSubmit={submit} className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"

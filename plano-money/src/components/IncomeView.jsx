@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { formatCurrency, parseNonNegativeNumber } from '../utils/format.js'
+import { parseAmountAndLabel } from '../utils/speech.js'
 import { toISODate } from '../utils/periods.js'
+import VoiceButton from './VoiceButton.jsx'
+import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
 
 export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedIncome, addVariableIncome, removeVariableIncome }) {
   const [fixedName, setFixedName] = useState('')
@@ -9,6 +12,8 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
   const [varName, setVarName] = useState('')
   const [varAmount, setVarAmount] = useState('')
   const [varDate, setVarDate] = useState(toISODate(new Date()))
+  const [fixedVoiceMsg, setFixedVoiceMsg] = useState(null)
+  const [varVoiceMsg, setVarVoiceMsg] = useState(null)
 
   const submitFixed = e => {
     e.preventDefault()
@@ -30,12 +35,45 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
     }
   }
 
+  // Dictating "Sueldo cuatro mil" (transcribed as "Sueldo 4000") adds the
+  // fixed income straight away; incomplete phrases just prefill the form.
+  const handleFixedTranscript = phrase => {
+    const { amount, label } = parseAmountAndLabel(phrase)
+    const num = Number(amount)
+    if (Number.isFinite(num) && num > 0 && label) {
+      addFixedIncome({ name: label, amount: num })
+      setFixedVoiceMsg(`$${formatCurrency(num, lang)}/mes · ${label}`)
+      setTimeout(() => setFixedVoiceMsg(null), 4000)
+    } else {
+      if (label) setFixedName(label)
+      if (amount) setFixedAmount(amount)
+    }
+  }
+
+  const handleVariableTranscript = phrase => {
+    const { amount, label } = parseAmountAndLabel(phrase)
+    const num = Number(amount)
+    const today = toISODate(new Date())
+    if (Number.isFinite(num) && num > 0 && label) {
+      addVariableIncome({ name: label, amount: num, date: today })
+      setVarVoiceMsg(`$${formatCurrency(num, lang)} · ${label}`)
+      setTimeout(() => setVarVoiceMsg(null), 4000)
+    } else {
+      if (label) setVarName(label)
+      if (amount) setVarAmount(amount)
+    }
+  }
+
   const sortedVariable = [...db.variableIncomeTransactions].sort((a, b) => (a.date < b.date ? 1 : -1))
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.fixedIncomeTitle}</h3>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.fixedIncomeTitle}</h3>
+          <VoiceButton t={t} lang={lang} onTranscript={handleFixedTranscript} />
+        </div>
+        <VoiceConfirmationBanner message={fixedVoiceMsg} />
         <form onSubmit={submitFixed} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <input
             type="text"
@@ -74,7 +112,11 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
       </div>
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.variableIncomeTitle}</h3>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.variableIncomeTitle}</h3>
+          <VoiceButton t={t} lang={lang} onTranscript={handleVariableTranscript} />
+        </div>
+        <VoiceConfirmationBanner message={varVoiceMsg} />
         <form onSubmit={submitVariable} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <input
             type="text"

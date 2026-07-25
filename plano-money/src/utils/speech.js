@@ -40,3 +40,18 @@ export function parseExpensePhrase(phrase, translations) {
 
   return { amount, categoryId, note: phrase }
 }
+
+const FILLER_WORDS = /\b(pesos|peso|dolares|dólares|usd|de|en|por|del|la|el)\b/gi
+
+// Generic parse for forms that just need "amount" + "everything else as a
+// label" (income, goals, profile names) — no category matching involved.
+export function parseAmountAndLabel(phrase) {
+  const amountMatch = phrase.match(/(\d+([.,]\d+)?)/)
+  const amount = amountMatch ? amountMatch[1].replace(',', '.') : ''
+
+  let label = amountMatch ? phrase.replace(amountMatch[0], '') : phrase
+  label = label.replace(FILLER_WORDS, '').replace(/\s+/g, ' ').trim()
+  if (label) label = label.charAt(0).toUpperCase() + label.slice(1)
+
+  return { amount, label }
+}

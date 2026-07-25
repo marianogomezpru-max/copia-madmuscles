@@ -1,13 +1,37 @@
+import { useState } from 'react'
 import { Target, Trash2 } from 'lucide-react'
 import { formatCurrency } from '../utils/format.js'
+import { parseAmountAndLabel } from '../utils/speech.js'
+import VoiceButton from './VoiceButton.jsx'
+import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
 
-export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, removeGoal, lang }) {
+export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoalDirect, removeGoal, lang }) {
+  const [voiceMsg, setVoiceMsg] = useState(null)
+
+  // Dictating "Viaje a Europa cinco mil" creates the goal straight away
+  // (saved starts at 0); an unrecognized amount just prefills the name.
+  const handleTranscript = phrase => {
+    const { amount, label } = parseAmountAndLabel(phrase)
+    const num = Number(amount)
+    if (Number.isFinite(num) && num > 0 && label) {
+      addGoalDirect({ name: label, target: num, saved: 0 })
+      setVoiceMsg(`${label} · ${t.goalLabel}: $${formatCurrency(num, lang)}`)
+      setTimeout(() => setVoiceMsg(null), 4000)
+    } else if (label) {
+      setNewGoal({ ...newGoal, name: label })
+    }
+  }
+
   return (
     <div className="space-y-6 animate-fade-in max-w-2xl mx-auto">
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-          <Target className="w-5 h-5 text-finaraCardPurple" /> {t.newGoalTitle}
-        </h3>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Target className="w-5 h-5 text-finaraCardPurple" /> {t.newGoalTitle}
+          </h3>
+          <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
+        </div>
+        <VoiceConfirmationBanner message={voiceMsg} />
         <form onSubmit={addGoal} className="space-y-4">
           <input
             type="text"

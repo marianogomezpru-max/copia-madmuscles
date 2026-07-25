@@ -116,13 +116,16 @@ export default function App() {
   }
 
   // Goals
+  const addGoalDirect = ({ name, target, saved }) => {
+    setDb(prev => ({ ...prev, goals: [...prev.goals, { id: uid(), name, target, saved: saved || 0 }] }))
+  }
   const addGoal = e => {
     e.preventDefault()
     const name = newGoal.name.trim()
     const target = parseNonNegativeNumber(newGoal.target)
     const saved = parseNonNegativeNumber(newGoal.saved)
     if (name && target > 0) {
-      setDb(prev => ({ ...prev, goals: [...prev.goals, { id: uid(), name, target, saved }] }))
+      addGoalDirect({ name, target, saved })
       setNewGoal({ name: '', target: '', saved: '' })
     }
   }
@@ -226,6 +229,7 @@ export default function App() {
           <ProfilesView
             t={t}
             db={db}
+            lang={db.language}
             isAdmin={isAdmin}
             addProfile={addProfile}
             removeProfile={removeProfile}
@@ -234,7 +238,16 @@ export default function App() {
         )}
 
         {activeTab === 'metas' && (
-          <GoalsView t={t} db={db} newGoal={newGoal} setNewGoal={setNewGoal} addGoal={addGoal} removeGoal={removeGoal} lang={db.language} />
+          <GoalsView
+            t={t}
+            db={db}
+            newGoal={newGoal}
+            setNewGoal={setNewGoal}
+            addGoal={addGoal}
+            addGoalDirect={addGoalDirect}
+            removeGoal={removeGoal}
+            lang={db.language}
+          />
         )}
       </div>
     </div>
