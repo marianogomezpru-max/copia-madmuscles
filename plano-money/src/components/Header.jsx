@@ -34,9 +34,9 @@ export default function Header({
               onChange={e => onLanguageChange(e.target.value)}
               className="bg-transparent text-white focus:outline-none cursor-pointer text-xs"
             >
-              <option value="es" className="bg-navy-900">Español</option>
-              <option value="en" className="bg-navy-900">English</option>
-              <option value="pt" className="bg-navy-900">Português</option>
+              <option value="es" className="bg-navy-900">🇦🇷 Español</option>
+              <option value="en" className="bg-navy-900">🇺🇸 English</option>
+              <option value="pt" className="bg-navy-900">🇧🇷 Português</option>
             </select>
           </div>
 

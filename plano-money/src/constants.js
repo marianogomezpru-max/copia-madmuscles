@@ -20,6 +20,7 @@ export const CATEGORIES = [
   { id: 'alquiler', group: 'hogar' },
   { id: 'supermercado', group: 'hogar' },
   { id: 'servicios', group: 'hogar' },
+  { id: 'expensas', group: 'hogar' },
   { id: 'transporte', group: 'movilidad' },
   { id: 'deuda_auto', group: 'deudas' },
   { id: 'deuda_moto', group: 'deudas' },

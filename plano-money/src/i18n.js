@@ -16,6 +16,7 @@ export const TRANSLATIONS = {
     categories: {
       alquiler: 'Alquiler / Hipoteca',
       servicios: 'Servicios Básicos',
+      expensas: 'Expensas',
       supermercado: 'Supermercado',
       deuda_auto: 'Deuda del Auto',
       deuda_moto: 'Deuda de la Moto',
@@ -147,6 +148,7 @@ export const TRANSLATIONS = {
     categories: {
       alquiler: 'Rent / Mortgage',
       servicios: 'Utilities',
+      expensas: 'HOA / Condo Fees',
       supermercado: 'Supermarket',
       deuda_auto: 'Car Loan',
       deuda_moto: 'Motorcycle Loan',
@@ -271,6 +273,7 @@ export const TRANSLATIONS = {
     categories: {
       alquiler: 'Aluguel / Hipoteca',
       servicios: 'Serviços Básicos',
+      expensas: 'Condomínio',
       supermercado: 'Supermercado',
       deuda_auto: 'Financiamento do Carro',
       deuda_moto: 'Financiamento da Moto',
