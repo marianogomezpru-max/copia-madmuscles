@@ -29,7 +29,7 @@ export default function ProfilesView({ t, db, lang, isAdmin, addProfile, removeP
       {isAdmin && (
         <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-bold text-navy-900 flex items-center gap-2">
               <Users className="w-5 h-5 text-brand-500" /> {t.addProfileTitle}
             </h3>
             <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />

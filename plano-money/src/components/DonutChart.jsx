@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { GROUPS, GROUP_COLORS } from '../constants.js'
-import { formatCurrency } from '../utils/format.js'
+import { formatMoney } from '../utils/format.js'
 
 const SIZE = 220
 const STROKE = 34
@@ -58,13 +58,13 @@ export default function DonutChart({ t, totalsByGroup, total, lang }) {
           {hovered ? (
             <>
               <span className="text-xs font-bold text-slate-400 uppercase">{t.groups[hovered]}</span>
-              <span className="text-lg font-black text-slate-900">${formatCurrency(totalsByGroup[hovered], lang)}</span>
+              <span className="text-lg font-black text-navy-900">{formatMoney(totalsByGroup[hovered], lang)}</span>
               <span className="text-xs text-slate-400">{Math.round((totalsByGroup[hovered] / total) * 100)}%</span>
             </>
           ) : (
             <>
               <span className="text-xs font-bold text-slate-400 uppercase">{t.cards.expenses}</span>
-              <span className="text-lg font-black text-slate-900">${formatCurrency(total, lang)}</span>
+              <span className="text-lg font-black text-navy-900">{formatMoney(total, lang)}</span>
             </>
           )}
         </div>
@@ -83,7 +83,7 @@ export default function DonutChart({ t, totalsByGroup, total, lang }) {
               <span className="text-sm font-semibold text-slate-700 truncate">{t.groups[arc.group]}</span>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-sm font-bold text-slate-900">${formatCurrency(arc.value, lang)}</span>
+              <span className="text-sm font-bold text-navy-900">{formatMoney(arc.value, lang)}</span>
               <span className="text-xs text-slate-400 w-10 text-right">{Math.round((arc.value / total) * 100)}%</span>
             </div>
           </div>

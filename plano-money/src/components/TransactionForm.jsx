@@ -3,7 +3,7 @@ import { Camera } from 'lucide-react'
 import { CATEGORIES, GROUPS } from '../constants.js'
 import { parseExpensePhrase } from '../utils/speech.js'
 import { compressImageFile } from '../utils/image.js'
-import { formatCurrency } from '../utils/format.js'
+import { formatMoney } from '../utils/format.js'
 import { toISODate } from '../utils/periods.js'
 import VoiceButton from './VoiceButton.jsx'
 import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
@@ -43,7 +43,7 @@ export default function TransactionForm({ t, lang, onAdd }) {
     if (Number.isFinite(num) && num > 0) {
       const today = toISODate(new Date())
       onAdd({ amount: num, categoryId: resolvedCategory, date: today, note: phrase, photo: null })
-      setVoiceMessage(`$${formatCurrency(num, lang)} · ${t.categories[resolvedCategory] || resolvedCategory}`)
+      setVoiceMessage(`${formatMoney(num, lang)} · ${t.categories[resolvedCategory] || resolvedCategory}`)
       setTimeout(() => setVoiceMessage(null), 4000)
     } else {
       if (parsed.categoryId) setCategoryId(parsed.categoryId)
@@ -61,7 +61,7 @@ export default function TransactionForm({ t, lang, onAdd }) {
   return (
     <form onSubmit={handleSubmit} className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.newTransactionTitle}</h3>
+        <h3 className="text-base sm:text-lg font-bold text-navy-900">{t.newTransactionTitle}</h3>
         <div className="flex gap-2">
           <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
           <button

@@ -1,4 +1,5 @@
 import { AlertTriangle, Bot } from 'lucide-react'
+import { formatMoney } from '../utils/format.js'
 
 export default function CoachAlert({ t, alerts, lang }) {
   return (
@@ -15,7 +16,7 @@ export default function CoachAlert({ t, alerts, lang }) {
                 <AlertTriangle className="w-4 h-4 text-finaraCardYellow shrink-0 mt-0.5 sm:mt-0" />
                 <span>
                   {t.coachOverspending
-                    .replace('${amount}', alert.diff.toLocaleString())
+                    .replace('{amount}', formatMoney(alert.diff, lang))
                     .replace('{category}', alert.category)}
                 </span>
               </p>

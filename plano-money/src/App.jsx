@@ -11,6 +11,7 @@ import ExpensesView from './components/ExpensesView.jsx'
 import IncomeView from './components/IncomeView.jsx'
 import ProfilesView from './components/ProfilesView.jsx'
 import GoalsView from './components/GoalsView.jsx'
+import SavingsInvestmentsView from './components/SavingsInvestmentsView.jsx'
 
 const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
@@ -29,7 +30,6 @@ export default function App() {
   const [db, setDb] = useState(loadDb)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [period, setPeriod] = useState('mensual')
-  const [loginName, setLoginName] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [newGoal, setNewGoal] = useState({ name: '', target: '', saved: '' })
 
@@ -45,20 +45,19 @@ export default function App() {
     ? CATEGORY_IDS
     : activeProfile.visibleCategories
 
-  const handleLogin = e => {
-    e.preventDefault()
-    const name = loginName.trim()
-    if (!name) return
+  // Real password verification + reset-by-email need the Supabase backend
+  // (not wired up yet) — for now this only matches/creates a local profile
+  // by email, the same trust model as the previous name-only login.
+  const handleLogin = ({ fullName, email }) => {
     setDb(prev => {
-      const existing = prev.profiles.find(p => p.name.toLowerCase() === name.toLowerCase())
+      const existing = prev.profiles.find(p => (p.email || '').toLowerCase() === email.toLowerCase())
       if (existing) {
-        return { ...prev, userProfile: { name }, activeProfileId: existing.id }
+        return { ...prev, userProfile: { name: existing.name, email }, activeProfileId: existing.id }
       }
       const role = prev.profiles.length === 0 ? 'admin' : 'member'
-      const newProfile = { id: uid(), name, role, visibleCategories: null }
-      return { ...prev, userProfile: { name }, profiles: [...prev.profiles, newProfile], activeProfileId: newProfile.id }
+      const newProfile = { id: uid(), name: fullName, email, role, visibleCategories: null }
+      return { ...prev, userProfile: { name: fullName, email }, profiles: [...prev.profiles, newProfile], activeProfileId: newProfile.id }
     })
-    setLoginName('')
   }
 
   const handleLogout = () => setDb(prev => ({ ...prev, userProfile: null, activeProfileId: null }))
@@ -131,7 +130,15 @@ export default function App() {
   }
   const removeGoal = id => setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
 
-  const { totalExpenses, totalIncome, netBalance, totalsByGroup, savingsProgress, coachAlerts } = useMemo(() => {
+  // Savings & Investments
+  const addSaving = ({ name, amount }) =>
+    setDb(prev => ({ ...prev, savings: [...prev.savings, { id: uid(), name, amount }] }))
+  const removeSaving = id => setDb(prev => ({ ...prev, savings: prev.savings.filter(s => s.id !== id) }))
+  const addInvestment = ({ type, name, amount }) =>
+    setDb(prev => ({ ...prev, investments: [...prev.investments, { id: uid(), type, name, amount }] }))
+  const removeInvestment = id => setDb(prev => ({ ...prev, investments: prev.investments.filter(i => i.id !== id) }))
+
+  const { totalExpenses, totalIncome, netBalance, totalsByGroup, savingsProgress, coachAlerts, budgetProgress } = useMemo(() => {
     const [start, end] = getPeriodRange(period)
     const visibleTx = db.expenseTransactions.filter(tx => visibleCategoryIds.includes(tx.categoryId))
     const periodTx = visibleTx.filter(tx => inRange(tx.date, start, end))
@@ -164,6 +171,10 @@ export default function App() {
       .filter(([cat, budget]) => (monthTotals[cat] || 0) > budget)
       .map(([cat, budget]) => ({ category: t.categories[cat] || cat, diff: Math.round(monthTotals[cat] - budget) }))
 
+    const progress = CATEGORIES
+      .filter(cat => db.budgets[cat.id] != null)
+      .map(cat => ({ categoryId: cat.id, spent: monthTotals[cat.id] || 0, budget: db.budgets[cat.id] }))
+
     return {
       totalExpenses: expensesSum,
       totalIncome: incomeSum,
@@ -171,11 +182,12 @@ export default function App() {
       totalsByGroup: groupTotals,
       savingsProgress: savings,
       coachAlerts: alerts,
+      budgetProgress: progress,
     }
   }, [db, period, visibleCategoryIds, t])
 
   if (!isLoggedIn) {
-    return <LoginScreen t={t} loginName={loginName} setLoginName={setLoginName} onSubmit={handleLogin} />
+    return <LoginScreen t={t} onLogin={handleLogin} />
   }
 
   return (
@@ -205,6 +217,7 @@ export default function App() {
             netBalance={netBalance}
             savingsProgress={savingsProgress}
             totalsByGroup={totalsByGroup}
+            budgetProgress={budgetProgress}
             lang={db.language}
           />
         )}
@@ -238,16 +251,27 @@ export default function App() {
         )}
 
         {activeTab === 'metas' && (
-          <GoalsView
-            t={t}
-            db={db}
-            newGoal={newGoal}
-            setNewGoal={setNewGoal}
-            addGoal={addGoal}
-            addGoalDirect={addGoalDirect}
-            removeGoal={removeGoal}
-            lang={db.language}
-          />
+          <div className="space-y-8">
+            <GoalsView
+              t={t}
+              db={db}
+              newGoal={newGoal}
+              setNewGoal={setNewGoal}
+              addGoal={addGoal}
+              addGoalDirect={addGoalDirect}
+              removeGoal={removeGoal}
+              lang={db.language}
+            />
+            <SavingsInvestmentsView
+              t={t}
+              db={db}
+              lang={db.language}
+              addSaving={addSaving}
+              removeSaving={removeSaving}
+              addInvestment={addInvestment}
+              removeInvestment={removeInvestment}
+            />
+          </div>
         )}
       </div>
     </div>

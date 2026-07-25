@@ -1,7 +1,7 @@
 import { Trash2 } from 'lucide-react'
 import TransactionForm from './TransactionForm.jsx'
 import { CATEGORIES } from '../constants.js'
-import { formatCurrency } from '../utils/format.js'
+import { formatMoney } from '../utils/format.js'
 
 export default function ExpensesView({ t, db, lang, addExpense, removeExpense, updateBudget }) {
   const sorted = [...db.expenseTransactions].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
@@ -11,7 +11,7 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
       <TransactionForm t={t} lang={lang} onAdd={addExpense} />
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4">{t.recentTransactions}</h3>
+        <h3 className="text-base sm:text-lg font-bold text-navy-900 mb-4">{t.recentTransactions}</h3>
         {sorted.length === 0 ? (
           <p className="text-center text-sm text-slate-400 py-4">{t.noExpensesInPeriod}</p>
         ) : (
@@ -26,7 +26,7 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-sm font-black text-slate-900">${formatCurrency(tx.amount, lang)}</span>
+                  <span className="text-sm font-black text-navy-900">{formatMoney(tx.amount, lang)}</span>
                   <button onClick={() => removeExpense(tx.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -38,7 +38,7 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
       </div>
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-4">{t.budgetsTitle}</h3>
+        <h3 className="text-base sm:text-lg font-bold text-navy-900 mb-4">{t.budgetsTitle}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {CATEGORIES.map(cat => (
             <div key={cat.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">

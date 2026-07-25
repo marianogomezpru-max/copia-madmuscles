@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
-import { formatCurrency, parseNonNegativeNumber } from '../utils/format.js'
+import { formatMoney, parseNonNegativeNumber } from '../utils/format.js'
 import { parseAmountAndLabel } from '../utils/speech.js'
 import { toISODate } from '../utils/periods.js'
 import VoiceButton from './VoiceButton.jsx'
@@ -42,7 +42,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
     const num = Number(amount)
     if (Number.isFinite(num) && num > 0 && label) {
       addFixedIncome({ name: label, amount: num })
-      setFixedVoiceMsg(`$${formatCurrency(num, lang)}/mes · ${label}`)
+      setFixedVoiceMsg(`${formatMoney(num, lang)}/mes · ${label}`)
       setTimeout(() => setFixedVoiceMsg(null), 4000)
     } else {
       if (label) setFixedName(label)
@@ -56,7 +56,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
     const today = toISODate(new Date())
     if (Number.isFinite(num) && num > 0 && label) {
       addVariableIncome({ name: label, amount: num, date: today })
-      setVarVoiceMsg(`$${formatCurrency(num, lang)} · ${label}`)
+      setVarVoiceMsg(`${formatMoney(num, lang)} · ${label}`)
       setTimeout(() => setVarVoiceMsg(null), 4000)
     } else {
       if (label) setVarName(label)
@@ -70,7 +70,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.fixedIncomeTitle}</h3>
+          <h3 className="text-base sm:text-lg font-bold text-navy-900">{t.fixedIncomeTitle}</h3>
           <VoiceButton t={t} lang={lang} onTranscript={handleFixedTranscript} />
         </div>
         <VoiceConfirmationBanner message={fixedVoiceMsg} />
@@ -101,7 +101,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
             <div key={inc.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
               <span className="text-sm font-bold text-slate-800">{inc.name}</span>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-slate-900">${formatCurrency(inc.amount, lang)}/mes</span>
+                <span className="text-sm font-black text-navy-900">{formatMoney(inc.amount, lang)}/mes</span>
                 <button onClick={() => removeFixedIncome(inc.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -113,7 +113,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900">{t.variableIncomeTitle}</h3>
+          <h3 className="text-base sm:text-lg font-bold text-navy-900">{t.variableIncomeTitle}</h3>
           <VoiceButton t={t} lang={lang} onTranscript={handleVariableTranscript} />
         </div>
         <VoiceConfirmationBanner message={varVoiceMsg} />
@@ -140,7 +140,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
             onChange={e => setVarDate(e.target.value)}
             className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
-          <button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-sm">
+          <button type="submit" className="bg-navy-900 hover:bg-navy-800 text-white font-bold py-2.5 rounded-xl text-sm">
             {t.addVariableIncomeBtn}
           </button>
         </form>
@@ -153,7 +153,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
                 <span className="text-xs text-slate-400 ml-2">{inc.date}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-black text-slate-900">${formatCurrency(inc.amount, lang)}</span>
+                <span className="text-sm font-black text-navy-900">{formatMoney(inc.amount, lang)}</span>
                 <button onClick={() => removeVariableIncome(inc.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>

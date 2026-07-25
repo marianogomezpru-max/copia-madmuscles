@@ -13,24 +13,26 @@ export const GROUP_COLORS = {
 
 export const GROUPS = ['hogar', 'deudas', 'movilidad', 'social', 'personal', 'otros']
 
+// Ordered primary → secondary (fixed necessities first, discretionary last) —
+// this is also the display order everywhere categories are listed.
 export const CATEGORIES = [
   { id: 'alquiler', group: 'hogar' },
-  { id: 'servicios', group: 'hogar' },
   { id: 'supermercado', group: 'hogar' },
+  { id: 'servicios', group: 'hogar' },
+  { id: 'transporte', group: 'movilidad' },
   { id: 'deuda_auto', group: 'deudas' },
   { id: 'deuda_moto', group: 'deudas' },
   { id: 'deuda_personal', group: 'deudas' },
   { id: 'deuda_otra', group: 'deudas' },
-  { id: 'transporte', group: 'movilidad' },
-  { id: 'viajes', group: 'movilidad' },
-  { id: 'mantenimiento_vehiculo', group: 'movilidad' },
   { id: 'seguros', group: 'movilidad' },
+  { id: 'mantenimiento_vehiculo', group: 'movilidad' },
+  { id: 'educacion', group: 'personal' },
   { id: 'restaurantes', group: 'social' },
   { id: 'reuniones', group: 'social' },
+  { id: 'viajes', group: 'movilidad' },
   { id: 'ropa', group: 'personal' },
   { id: 'peluqueria', group: 'personal' },
   { id: 'esteticista', group: 'personal' },
-  { id: 'educacion', group: 'personal' },
   { id: 'suscripciones', group: 'personal' },
   { id: 'proyecto_especial', group: 'otros' },
 ]
@@ -47,6 +49,10 @@ export const PERIOD_MONTHS = {
   anual: 12,
 }
 
+export const CURRENCY_SYMBOLS = { es: '$', en: '$', pt: 'R$' }
+
+export const INVESTMENT_TYPES = ['plazo_fijo', 'cripto', 'titulos', 'bonos', 'otro']
+
 export const DEFAULT_DB = {
   userProfile: null,
   language: 'es',
@@ -57,4 +63,6 @@ export const DEFAULT_DB = {
   expenseTransactions: [],
   budgets: {},
   goals: [],
+  savings: [],
+  investments: [],
 }

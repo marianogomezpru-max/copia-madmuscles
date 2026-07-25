@@ -1,4 +1,5 @@
-import { Activity, Globe, LogOut, Menu, X } from 'lucide-react'
+import { Globe, LogOut, Menu, X } from 'lucide-react'
+import Logo from './Logo.jsx'
 
 export default function Header({
   t,
@@ -13,11 +14,9 @@ export default function Header({
 }) {
   return (
     <>
-      <div className="bg-navy-900 text-white px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-3 border-b border-slate-800">
+      <div className="bg-navy-900 text-white px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-3 border-b border-navy-800">
         <div className="flex items-center gap-3">
-          <div className="bg-brand-500 p-2.5 rounded-xl shadow-md">
-            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-          </div>
+          <Logo className="w-10 h-10 sm:w-11 sm:h-11" />
           <div>
             <h1 className="text-lg sm:text-xl font-bold tracking-tight">Plano.Money</h1>
             <p className="text-xs text-slate-400 truncate max-w-[140px] sm:max-w-none">{userName}</p>
@@ -25,7 +24,7 @@ export default function Header({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center bg-slate-800 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-700 text-xs font-semibold gap-1.5">
+          <div className="flex items-center bg-navy-800 px-2 sm:px-3 py-1.5 rounded-xl border border-navy-700 text-xs font-semibold gap-1.5">
             <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-500 shrink-0" />
             <select
               aria-label="Language"
@@ -33,9 +32,9 @@ export default function Header({
               onChange={e => onLanguageChange(e.target.value)}
               className="bg-transparent text-white focus:outline-none cursor-pointer text-xs"
             >
-              <option value="es" className="bg-slate-900">Español</option>
-              <option value="en" className="bg-slate-900">English</option>
-              <option value="pt" className="bg-slate-900">Português</option>
+              <option value="es" className="bg-navy-900">Español</option>
+              <option value="en" className="bg-navy-900">English</option>
+              <option value="pt" className="bg-navy-900">Português</option>
             </select>
           </div>
 

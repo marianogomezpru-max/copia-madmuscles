@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Target, Trash2 } from 'lucide-react'
-import { formatCurrency } from '../utils/format.js'
+import { formatMoney } from '../utils/format.js'
 import { parseAmountAndLabel } from '../utils/speech.js'
 import VoiceButton from './VoiceButton.jsx'
 import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
@@ -15,7 +15,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
     const num = Number(amount)
     if (Number.isFinite(num) && num > 0 && label) {
       addGoalDirect({ name: label, target: num, saved: 0 })
-      setVoiceMsg(`${label} · ${t.goalLabel}: $${formatCurrency(num, lang)}`)
+      setVoiceMsg(`${label} · ${t.goalLabel}: ${formatMoney(num, lang)}`)
       setTimeout(() => setVoiceMsg(null), 4000)
     } else if (label) {
       setNewGoal({ ...newGoal, name: label })
@@ -26,7 +26,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
     <div className="space-y-6 animate-fade-in max-w-2xl mx-auto">
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+          <h3 className="text-base sm:text-lg font-bold text-navy-900 flex items-center gap-2">
             <Target className="w-5 h-5 text-finaraCardPurple" /> {t.newGoalTitle}
           </h3>
           <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
@@ -63,7 +63,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
           </div>
           <button
             type="submit"
-            className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
+            className="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
           >
             {t.createGoalBtn}
           </button>
@@ -79,7 +79,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
           return (
             <div key={g.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
               <div className="flex justify-between items-center">
-                <h4 className="font-bold text-slate-900 text-sm sm:text-base">{g.name}</h4>
+                <h4 className="font-bold text-navy-900 text-sm sm:text-base">{g.name}</h4>
                 <button onClick={() => removeGoal(g.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -88,8 +88,8 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
                 <div className="bg-finaraCardPurple h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
               </div>
               <div className="flex justify-between text-xs sm:text-sm font-semibold text-slate-600">
-                <span>${formatCurrency(g.saved, lang)} {t.savedLabel}</span>
-                <span>{t.goalLabel}: ${formatCurrency(g.target, lang)}</span>
+                <span>{formatMoney(g.saved, lang)} {t.savedLabel}</span>
+                <span>{t.goalLabel}: {formatMoney(g.target, lang)}</span>
               </div>
             </div>
           )
