@@ -1,10 +1,11 @@
 import { formatMoney } from '../utils/format.js'
 
-// Meter spec: fill carries severity (good → warning → critical), track is a
-// lighter step of the same ramp so state reads across the whole bar.
+// Meter spec: fill carries severity, track is a lighter step of the same
+// ramp. Red is reserved for the one true risk state — at or over budget;
+// the "approaching" tier uses celeste (in-palette) instead of amber.
 const SEVERITY = {
-  good: { fill: '#0ca30c', track: '#dcf5dc' },
-  warning: { fill: '#c98500', track: '#faecd0' },
+  good: { fill: '#059669', track: '#d1fae5' },
+  warning: { fill: '#0ea5e9', track: '#dbeef9' },
   critical: { fill: '#d03b3b', track: '#f8dada' },
 }
 

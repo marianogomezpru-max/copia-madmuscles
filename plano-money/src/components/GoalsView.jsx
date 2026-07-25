@@ -27,7 +27,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h3 className="text-base sm:text-lg font-bold text-navy-900 flex items-center gap-2">
-            <Target className="w-5 h-5 text-finaraCardPurple" /> {t.newGoalTitle}
+            <Target className="w-5 h-5 text-lila-500" /> {t.newGoalTitle}
           </h3>
           <VoiceButton t={t} lang={lang} onTranscript={handleTranscript} />
         </div>
@@ -63,7 +63,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
           </div>
           <button
             type="submit"
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
+            className="w-full bg-celeste-500 hover:bg-celeste-600 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
           >
             {t.createGoalBtn}
           </button>
@@ -85,7 +85,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
                 </button>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                <div className="bg-finaraCardPurple h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                <div className="bg-lila-500 h-full transition-all duration-500" style={{ width: `${progress}%` }}></div>
               </div>
               <div className="flex justify-between text-xs sm:text-sm font-semibold text-slate-600">
                 <span>{formatMoney(g.saved, lang)} {t.savedLabel}</span>

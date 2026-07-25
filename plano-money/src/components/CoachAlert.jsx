@@ -3,7 +3,7 @@ import { formatMoney } from '../utils/format.js'
 
 export default function CoachAlert({ t, alerts, lang }) {
   return (
-    <div className="bg-gradient-to-r from-violet-700 to-purple-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg flex items-start gap-3 sm:gap-4">
+    <div className="bg-gradient-to-r from-lila-600 to-lila-500 rounded-2xl p-4 sm:p-5 text-white shadow-lg flex items-start gap-3 sm:gap-4">
       <div className="p-2.5 sm:p-3 bg-white/15 rounded-xl shrink-0 backdrop-blur-md">
         <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-purple-100" />
       </div>
@@ -13,7 +13,7 @@ export default function CoachAlert({ t, alerts, lang }) {
           <div className="space-y-1.5">
             {alerts.map((alert, idx) => (
               <p key={idx} className="text-xs sm:text-sm text-slate-200 flex items-start sm:items-center gap-2 leading-relaxed">
-                <AlertTriangle className="w-4 h-4 text-finaraCardYellow shrink-0 mt-0.5 sm:mt-0" />
+                <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5 sm:mt-0" />
                 <span>
                   {t.coachOverspending
                     .replace('{amount}', formatMoney(alert.diff, lang))

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { PiggyBank, TrendingUp, Trash2 } from 'lucide-react'
 import { formatMoney, parseNonNegativeNumber } from '../utils/format.js'
 import { parseAmountAndLabel } from '../utils/speech.js'
-import { INVESTMENT_TYPES } from '../constants.js'
+import { CURRENCY_SYMBOLS, INVESTMENT_TYPES } from '../constants.js'
 import VoiceButton from './VoiceButton.jsx'
 import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
 
@@ -14,6 +14,7 @@ export default function SavingsInvestmentsView({
   removeSaving,
   addInvestment,
   removeInvestment,
+  setMonthlySavingsGoal,
 }) {
   const [savingName, setSavingName] = useState('')
   const [savingAmount, setSavingAmount] = useState('')
@@ -81,6 +82,25 @@ export default function SavingsInvestmentsView({
       <div className="bg-gradient-to-r from-navy-900 to-accent-600 rounded-2xl p-5 sm:p-6 text-white shadow-lg flex items-center justify-between">
         <span className="text-sm font-semibold uppercase tracking-wide text-white/80">{t.totalPatrimonioLabel}</span>
         <span className="text-2xl sm:text-3xl font-black">{formatMoney(totalPatrimonio, lang)}</span>
+      </div>
+
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">{t.monthlySavingsGoalLabel}</label>
+        <div className="relative max-w-xs">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+            {CURRENCY_SYMBOLS[lang] || '$'}
+          </span>
+          <input
+            type="number"
+            min="0"
+            step="any"
+            placeholder={t.monthlySavingsGoalPlaceholder}
+            value={db.monthlySavingsGoal || ''}
+            onChange={e => setMonthlySavingsGoal(e.target.value)}
+            className="w-full pl-8 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg font-bold text-slate-900 text-sm sm:text-base focus:ring-2 focus:ring-brand-500 focus:outline-none"
+          />
+        </div>
+        <p className="text-xs text-slate-400 mt-2">{t.monthlySavingsGoalHint}</p>
       </div>
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">

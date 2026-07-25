@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { CATEGORIES, CATEGORY_IDS, DB_KEY, DEFAULT_DB, PERIOD_MONTHS } from './constants.js'
 import { TRANSLATIONS } from './i18n.js'
 import { parseNonNegativeNumber, uid } from './utils/format.js'
-import { getPeriodRange, inRange, isCurrentMonth } from './utils/periods.js'
+import { getPeriodRange, inRange, isCurrentMonth, toISODate } from './utils/periods.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import Header from './components/Header.jsx'
 import CoachAlert from './components/CoachAlert.jsx'
@@ -130,15 +130,31 @@ export default function App() {
   }
   const removeGoal = id => setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
 
-  // Savings & Investments
+  // Savings & Investments — each entry is dated so contributions can be
+  // aggregated per period (mensual/bimestral/trimestral/semestral/anual),
+  // the same pattern as expenses and variable income.
   const addSaving = ({ name, amount }) =>
-    setDb(prev => ({ ...prev, savings: [...prev.savings, { id: uid(), name, amount }] }))
+    setDb(prev => ({ ...prev, savings: [...prev.savings, { id: uid(), name, amount, date: toISODate(new Date()) }] }))
   const removeSaving = id => setDb(prev => ({ ...prev, savings: prev.savings.filter(s => s.id !== id) }))
   const addInvestment = ({ type, name, amount }) =>
-    setDb(prev => ({ ...prev, investments: [...prev.investments, { id: uid(), type, name, amount }] }))
+    setDb(prev => ({
+      ...prev,
+      investments: [...prev.investments, { id: uid(), type, name, amount, date: toISODate(new Date()) }],
+    }))
   const removeInvestment = id => setDb(prev => ({ ...prev, investments: prev.investments.filter(i => i.id !== id) }))
+  const setMonthlySavingsGoal = value => setDb(prev => ({ ...prev, monthlySavingsGoal: parseNonNegativeNumber(value) }))
 
-  const { totalExpenses, totalIncome, netBalance, totalsByGroup, savingsProgress, coachAlerts, budgetProgress } = useMemo(() => {
+  const {
+    totalExpenses,
+    totalIncome,
+    netBalance,
+    totalsByGroup,
+    savingsProgress,
+    savedInPeriod,
+    periodSavingsGoal,
+    coachAlerts,
+    budgetProgress,
+  } = useMemo(() => {
     const [start, end] = getPeriodRange(period)
     const visibleTx = db.expenseTransactions.filter(tx => visibleCategoryIds.includes(tx.categoryId))
     const periodTx = visibleTx.filter(tx => inRange(tx.date, start, end))
@@ -158,9 +174,15 @@ export default function App() {
       .reduce((a, i) => a + i.amount, 0)
     const incomeSum = fixedSum + variableSum
 
-    const totalGoalTarget = db.goals.reduce((a, g) => a + (Number(g.target) || 0), 0)
-    const totalGoalSaved = db.goals.reduce((a, g) => a + (Number(g.saved) || 0), 0)
-    const savings = totalGoalTarget > 0 ? Math.round((totalGoalSaved / totalGoalTarget) * 100) : 0
+    // Savings progress = actual money set aside this period (savings +
+    // investments contributions) vs. the monthly savings goal scaled to the
+    // selected period — not the Metas goals, which have their own per-goal
+    // progress bars in the Metas tab.
+    const periodSavingsGoal = (db.monthlySavingsGoal || 0) * months
+    const savedInPeriod =
+      db.savings.filter(s => inRange(s.date, start, end)).reduce((a, s) => a + s.amount, 0) +
+      db.investments.filter(i => inRange(i.date, start, end)).reduce((a, i) => a + i.amount, 0)
+    const savings = periodSavingsGoal > 0 ? Math.round((savedInPeriod / periodSavingsGoal) * 100) : 0
 
     const monthTotals = {}
     db.expenseTransactions.forEach(tx => {
@@ -181,6 +203,8 @@ export default function App() {
       netBalance: incomeSum - expensesSum,
       totalsByGroup: groupTotals,
       savingsProgress: savings,
+      savedInPeriod,
+      periodSavingsGoal,
       coachAlerts: alerts,
       budgetProgress: progress,
     }
@@ -216,6 +240,8 @@ export default function App() {
             totalExpenses={totalExpenses}
             netBalance={netBalance}
             savingsProgress={savingsProgress}
+            savedInPeriod={savedInPeriod}
+            periodSavingsGoal={periodSavingsGoal}
             totalsByGroup={totalsByGroup}
             budgetProgress={budgetProgress}
             lang={db.language}
@@ -270,6 +296,7 @@ export default function App() {
               removeSaving={removeSaving}
               addInvestment={addInvestment}
               removeInvestment={removeInvestment}
+              setMonthlySavingsGoal={setMonthlySavingsGoal}
             />
           </div>
         )}

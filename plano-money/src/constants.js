@@ -1,14 +1,16 @@
 export const DB_KEY = 'plano_money_db_v4'
 
-// Fixed hue order from the validated categorical palette — never reorder or
-// recolor per-category; adjacent slices must keep the CVD-safe adjacency.
+// Six shades within the app's constrained palette (azul oscuro, azul suave,
+// lila, celeste, verde) — chosen for lightness/hue spread so groups stay
+// distinguishable even without color, since the donut always pairs them
+// with a direct label in the legend.
 export const GROUP_COLORS = {
-  hogar: { light: '#2a78d6', dark: '#3987e5' },
-  deudas: { light: '#eb6834', dark: '#d95926' },
-  movilidad: { light: '#1baf7a', dark: '#199e70' },
-  social: { light: '#eda100', dark: '#c98500' },
-  personal: { light: '#e87ba4', dark: '#d55181' },
-  otros: { light: '#008300', dark: '#008300' },
+  hogar: { light: '#1e3a8a', dark: '#1e3a8a' }, // azul oscuro
+  deudas: { light: '#0ea5e9', dark: '#0ea5e9' }, // celeste
+  movilidad: { light: '#8b5cf6', dark: '#8b5cf6' }, // lila
+  social: { light: '#93c5fd', dark: '#93c5fd' }, // azul suave
+  personal: { light: '#059669', dark: '#059669' }, // verde
+  otros: { light: '#1a1652', dark: '#1a1652' }, // navy profundo
 }
 
 export const GROUPS = ['hogar', 'deudas', 'movilidad', 'social', 'personal', 'otros']
@@ -66,4 +68,5 @@ export const DEFAULT_DB = {
   goals: [],
   savings: [],
   investments: [],
+  monthlySavingsGoal: 0,
 }
