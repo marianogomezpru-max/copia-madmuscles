@@ -25,8 +25,15 @@ export default function SavingsInvestmentsView({
   const [investmentAmount, setInvestmentAmount] = useState('')
   const [investmentVoiceMsg, setInvestmentVoiceMsg] = useState(null)
 
+  // Includes what's already marked "ahorrado" on each Meta, not just the
+  // Ahorros/Inversiones ledger — a goal's progress is money set aside too.
+  // If the same peso is logged both as a goal's "ya ahorrado" and as a
+  // Saving/Investment entry, it gets counted twice here; the hint below
+  // says so.
   const totalPatrimonio =
-    db.savings.reduce((a, s) => a + s.amount, 0) + db.investments.reduce((a, i) => a + i.amount, 0)
+    db.savings.reduce((a, s) => a + s.amount, 0) +
+    db.investments.reduce((a, i) => a + i.amount, 0) +
+    db.goals.reduce((a, g) => a + (g.saved || 0), 0)
 
   const submitSaving = e => {
     e.preventDefault()
@@ -79,9 +86,12 @@ export default function SavingsInvestmentsView({
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="bg-gradient-to-r from-navy-900 to-accent-600 rounded-2xl p-5 sm:p-6 text-white shadow-lg flex items-center justify-between">
-        <span className="text-sm font-semibold uppercase tracking-wide text-white/80">{t.totalPatrimonioLabel}</span>
-        <span className="text-2xl sm:text-3xl font-black">{formatMoney(totalPatrimonio, lang)}</span>
+      <div className="bg-gradient-to-r from-navy-900 to-accent-600 rounded-2xl p-5 sm:p-6 text-white shadow-lg">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold uppercase tracking-wide text-white/80">{t.totalPatrimonioLabel}</span>
+          <span className="text-2xl sm:text-3xl font-black">{formatMoney(totalPatrimonio, lang)}</span>
+        </div>
+        <p className="text-xs text-white/60 mt-2">{t.totalPatrimonioHint}</p>
       </div>
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
