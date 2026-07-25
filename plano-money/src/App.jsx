@@ -18,6 +18,7 @@ import ProfilesView from './components/ProfilesView.jsx'
 import GoalsView from './components/GoalsView.jsx'
 import SavingsInvestmentsView from './components/SavingsInvestmentsView.jsx'
 import VacationControlView from './components/VacationControlView.jsx'
+import Footer from './components/Footer.jsx'
 
 const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
@@ -509,7 +510,7 @@ export default function App() {
   }
 
   if (!session || !db) {
-    return <LoginScreen t={t} />
+    return <LoginScreen t={t} lang={db?.language || 'es'} />
   }
 
   return (
@@ -628,6 +629,7 @@ export default function App() {
         )}
 
         <BottomNav t={t} activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} />
+        <Footer t={t} lang={db.language} />
       </div>
       )}
     </div>

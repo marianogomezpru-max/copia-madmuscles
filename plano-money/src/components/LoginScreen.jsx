@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { LogIn, UserPlus } from 'lucide-react'
 import Logo from './Logo.jsx'
+import Footer from './Footer.jsx'
 import { supabase } from '../lib/supabaseClient.js'
 import { joinHousehold } from '../lib/db.js'
 import { PENDING_JOIN_KEY } from '../lib/pendingJoin.js'
 
-export default function LoginScreen({ t }) {
+export default function LoginScreen({ t, lang }) {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -81,7 +82,7 @@ export default function LoginScreen({ t }) {
   }
 
   return (
-    <div className="w-full min-h-[520px] flex items-center justify-center p-4">
+    <div className="w-full min-h-[520px] flex flex-col items-center justify-center p-4">
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-200 max-w-md w-full text-center animate-fade-in">
         <Logo className="w-14 h-14 mx-auto mb-4" />
         <h2 className="text-xl sm:text-2xl font-bold text-navy-900 mb-2">{t.loginTitle}</h2>
@@ -174,6 +175,7 @@ export default function LoginScreen({ t }) {
           </button>
         </form>
       </div>
+      <Footer t={t} lang={lang} />
     </div>
   )
 }
