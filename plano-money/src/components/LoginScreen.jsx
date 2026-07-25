@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LogIn, UserPlus } from 'lucide-react'
 import Logo from './Logo.jsx'
 import Footer from './Footer.jsx'
@@ -6,16 +6,29 @@ import { supabase } from '../lib/supabaseClient.js'
 import { joinHousehold } from '../lib/db.js'
 import { PENDING_JOIN_KEY } from '../lib/pendingJoin.js'
 
+// A "Crear mi cuenta" link from the access-code email lands here with
+// ?access_code=... — jump straight to signup with it pre-filled instead
+// of making the customer copy-paste it from the email by hand.
+function accessCodeFromUrl() {
+  return new URLSearchParams(window.location.search).get('access_code') || ''
+}
+
 export default function LoginScreen({ t, lang }) {
-  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
+  const [mode, setMode] = useState(() => (accessCodeFromUrl() ? 'signup' : 'signin'))
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [inviteCode, setInviteCode] = useState('')
-  const [accessCode, setAccessCode] = useState('')
+  const [accessCode, setAccessCode] = useState(accessCodeFromUrl)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (window.location.search.includes('access_code')) {
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
 
   const handleSubmit = async e => {
     e.preventDefault()
