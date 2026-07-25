@@ -3,13 +3,11 @@
 // default emoji font, so they'd disappear for a lot of users.
 const base = 'w-4 h-3 rounded-sm shrink-0 ring-1 ring-black/10'
 
-export function FlagAR({ className = '' }) {
+export function FlagES({ className = '' }) {
   return (
     <svg viewBox="0 0 24 16" className={`${base} ${className}`}>
-      <rect width="24" height="16" fill="#fff" />
-      <rect width="24" height="5.3" fill="#74ACDF" />
-      <rect y="10.7" width="24" height="5.3" fill="#74ACDF" />
-      <circle cx="12" cy="8" r="1.6" fill="#F6B40E" />
+      <rect width="24" height="16" fill="#AA151B" />
+      <rect y="4" width="24" height="8" fill="#F1BF00" />
     </svg>
   )
 }
@@ -40,7 +38,7 @@ export function FlagBR({ className = '' }) {
 }
 
 export const LANGUAGES = [
-  { code: 'es', label: 'Español', Flag: FlagAR },
+  { code: 'es', label: 'Español', Flag: FlagES },
   { code: 'en', label: 'English', Flag: FlagUS },
   { code: 'pt', label: 'Português', Flag: FlagBR },
 ]
