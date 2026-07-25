@@ -63,7 +63,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
           </div>
           <button
             type="submit"
-            className="w-full bg-navy-900 hover:bg-navy-800 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
           >
             {t.createGoalBtn}
           </button>

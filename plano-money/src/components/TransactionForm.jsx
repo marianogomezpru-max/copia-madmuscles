@@ -124,7 +124,7 @@ export default function TransactionForm({ t, lang, onAdd }) {
         />
       </div>
 
-      <button type="submit" className="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base">
+      <button type="submit" className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base">
         {t.addTransactionBtn}
       </button>
     </form>

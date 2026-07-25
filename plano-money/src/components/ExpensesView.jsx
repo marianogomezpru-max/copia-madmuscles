@@ -1,10 +1,11 @@
 import { Trash2 } from 'lucide-react'
 import TransactionForm from './TransactionForm.jsx'
-import { CATEGORIES } from '../constants.js'
+import { CATEGORIES, CURRENCY_SYMBOLS } from '../constants.js'
 import { formatMoney } from '../utils/format.js'
 
 export default function ExpensesView({ t, db, lang, addExpense, removeExpense, updateBudget }) {
   const sorted = [...db.expenseTransactions].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
+  const profileName = profileId => db.profiles.find(p => p.id === profileId)?.name
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -21,7 +22,14 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
                 <div className="flex items-center gap-3 min-w-0">
                   {tx.photo && <img src={tx.photo} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0" />}
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-slate-800 truncate">{t.categories[tx.categoryId] || tx.categoryId}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-slate-800 truncate">{t.categories[tx.categoryId] || tx.categoryId}</p>
+                      {profileName(tx.profileId) && (
+                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-accent-500/10 text-accent-600 shrink-0">
+                          {profileName(tx.profileId)}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-400">{tx.date}{tx.note ? ` · ${tx.note}` : ''}</p>
                   </div>
                 </div>
@@ -44,7 +52,9 @@ export default function ExpensesView({ t, db, lang, addExpense, removeExpense, u
             <div key={cat.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
               <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">{t.categories[cat.id]}</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs font-semibold">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-xs font-semibold">
+                  {CURRENCY_SYMBOLS[lang] || '$'}
+                </span>
                 <input
                   type="number"
                   min="0"

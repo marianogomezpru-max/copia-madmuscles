@@ -3,12 +3,12 @@ import { formatMoney } from '../utils/format.js'
 
 export default function CoachAlert({ t, alerts, lang }) {
   return (
-    <div className="bg-gradient-to-r from-indigo-900 to-navy-900 rounded-2xl p-4 sm:p-5 text-white shadow-lg flex items-start gap-3 sm:gap-4">
-      <div className="p-2.5 sm:p-3 bg-white/10 rounded-xl shrink-0 backdrop-blur-md">
-        <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-brand-400" />
+    <div className="bg-gradient-to-r from-violet-700 to-purple-600 rounded-2xl p-4 sm:p-5 text-white shadow-lg flex items-start gap-3 sm:gap-4">
+      <div className="p-2.5 sm:p-3 bg-white/15 rounded-xl shrink-0 backdrop-blur-md">
+        <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-purple-100" />
       </div>
       <div className="flex-1">
-        <h3 className="font-bold text-xs sm:text-sm tracking-wide text-brand-400 uppercase mb-1">{t.coachAlert}</h3>
+        <h3 className="font-bold text-xs sm:text-sm tracking-wide text-purple-100 uppercase mb-1">{t.coachAlert}</h3>
         {alerts.length > 0 ? (
           <div className="space-y-1.5">
             {alerts.map((alert, idx) => (

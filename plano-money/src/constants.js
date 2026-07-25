@@ -35,6 +35,7 @@ export const CATEGORIES = [
   { id: 'esteticista', group: 'personal' },
   { id: 'suscripciones', group: 'personal' },
   { id: 'proyecto_especial', group: 'otros' },
+  { id: 'gastos_varios', group: 'otros' },
 ]
 
 export const CATEGORY_IDS = CATEGORIES.map(c => c.id)

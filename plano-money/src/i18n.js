@@ -33,6 +33,7 @@ export const TRANSLATIONS = {
       educacion: 'Educación',
       suscripciones: 'Suscripciones',
       proyecto_especial: 'Proyecto Especial',
+      gastos_varios: 'Gastos Varios',
     },
     groups: {
       hogar: 'Hogar',
@@ -135,6 +136,7 @@ export const TRANSLATIONS = {
       educacion: 'Education',
       suscripciones: 'Subscriptions',
       proyecto_especial: 'Special Project',
+      gastos_varios: 'Miscellaneous Expenses',
     },
     groups: { hogar: 'Home', deudas: 'Debts', movilidad: 'Mobility', social: 'Social', personal: 'Personal', otros: 'Other' },
     periods: { mensual: 'Monthly', bimestral: 'Bimonthly', trimestral: 'Quarterly', semestral: 'Biannual', anual: 'Annual' },
@@ -230,6 +232,7 @@ export const TRANSLATIONS = {
       educacion: 'Educação',
       suscripciones: 'Assinaturas',
       proyecto_especial: 'Projeto Especial',
+      gastos_varios: 'Despesas Diversas',
     },
     groups: { hogar: 'Casa', deudas: 'Dívidas', movilidad: 'Mobilidade', social: 'Social', personal: 'Pessoal', otros: 'Outros' },
     periods: { mensual: 'Mensal', bimestral: 'Bimestral', trimestral: 'Trimestral', semestral: 'Semestral', anual: 'Anual' },
