@@ -1,5 +1,6 @@
-import { FileSpreadsheet, FileText, Globe, LogOut, Menu, X } from 'lucide-react'
+import { FileSpreadsheet, FileText, LogOut, Menu, X } from 'lucide-react'
 import Logo from './Logo.jsx'
+import LanguageSwitcher from './LanguageSwitcher.jsx'
 
 export default function Header({
   t,
@@ -26,19 +27,7 @@ export default function Header({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center bg-navy-800 px-2 sm:px-3 py-1.5 rounded-xl border border-navy-700 text-xs font-semibold gap-1.5">
-            <Globe className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-500 shrink-0" />
-            <select
-              aria-label="Language"
-              value={language}
-              onChange={e => onLanguageChange(e.target.value)}
-              className="bg-transparent text-white focus:outline-none cursor-pointer text-xs"
-            >
-              <option value="es" className="bg-navy-900">🇦🇷 Español</option>
-              <option value="en" className="bg-navy-900">🇺🇸 English</option>
-              <option value="pt" className="bg-navy-900">🇧🇷 Português</option>
-            </select>
-          </div>
+          <LanguageSwitcher language={language} onLanguageChange={onLanguageChange} />
 
           <button
             onClick={onExportCSV}

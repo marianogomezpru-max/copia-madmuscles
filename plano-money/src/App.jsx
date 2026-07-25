@@ -165,6 +165,11 @@ export default function App() {
     }
   }
   const removeGoal = id => setDb(prev => ({ ...prev, goals: prev.goals.filter(g => g.id !== id) }))
+  const addGoalContribution = (id, amount) =>
+    setDb(prev => ({
+      ...prev,
+      goals: prev.goals.map(g => (g.id === id ? { ...g, saved: (g.saved || 0) + amount } : g)),
+    }))
 
   // Savings & Investments — each entry is dated so contributions can be
   // aggregated per period (mensual/bimestral/trimestral/semestral/anual),
@@ -459,6 +464,7 @@ export default function App() {
               addGoal={addGoal}
               addGoalDirect={addGoalDirect}
               removeGoal={removeGoal}
+              addGoalContribution={addGoalContribution}
               lang={db.language}
             />
             <SavingsInvestmentsView

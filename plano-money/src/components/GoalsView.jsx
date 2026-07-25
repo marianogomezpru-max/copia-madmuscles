@@ -1,11 +1,44 @@
 import { useState } from 'react'
-import { Target, Trash2 } from 'lucide-react'
-import { formatMoney } from '../utils/format.js'
+import { Plus, Target, Trash2 } from 'lucide-react'
+import { formatMoney, parseNonNegativeNumber } from '../utils/format.js'
 import { parseAmountAndLabel } from '../utils/speech.js'
 import VoiceButton from './VoiceButton.jsx'
 import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
 
-export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoalDirect, removeGoal, lang }) {
+function GoalContributionForm({ t, goalId, onAdd }) {
+  const [amount, setAmount] = useState('')
+
+  const submit = e => {
+    e.preventDefault()
+    const num = parseNonNegativeNumber(amount)
+    if (num > 0) {
+      onAdd(goalId, num)
+      setAmount('')
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="flex gap-2">
+      <input
+        type="number"
+        min="0.01"
+        step="any"
+        placeholder={t.goalContributionPlaceholder}
+        value={amount}
+        onChange={e => setAmount(e.target.value)}
+        className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+      />
+      <button
+        type="submit"
+        className="flex items-center gap-1 bg-lila-500 hover:bg-lila-600 text-white font-bold px-3 py-2 rounded-lg text-sm shrink-0"
+      >
+        <Plus className="w-4 h-4" /> {t.addGoalContributionBtn}
+      </button>
+    </form>
+  )
+}
+
+export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoalDirect, removeGoal, addGoalContribution, lang }) {
   const [voiceMsg, setVoiceMsg] = useState(null)
 
   // Dictating "Viaje a Europa cinco mil" creates the goal straight away
@@ -68,6 +101,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
             {t.createGoalBtn}
           </button>
         </form>
+        <p className="text-xs text-slate-400">{t.newGoalHint}</p>
       </div>
 
       <div className="space-y-4">
@@ -91,6 +125,7 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
                 <span>{formatMoney(g.saved, lang)} {t.savedLabel}</span>
                 <span>{t.goalLabel}: {formatMoney(g.target, lang)}</span>
               </div>
+              <GoalContributionForm t={t} goalId={g.id} onAdd={addGoalContribution} />
             </div>
           )
         })}
