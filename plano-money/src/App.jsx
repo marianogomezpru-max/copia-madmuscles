@@ -24,6 +24,7 @@ export default function App() {
   const [session, setSession] = useState(undefined) // undefined = still checking, null = signed out
   const [passwordRecovery, setPasswordRecovery] = useState(false)
   const [db, setDb] = useState(null)
+  const [loadError, setLoadError] = useState('')
   const [activeTab, setActiveTab] = useState('dashboard')
   const [period, setPeriod] = useState('mensual')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -42,6 +43,7 @@ export default function App() {
   useEffect(() => {
     if (!session?.user) return
     let cancelled = false
+    setLoadError('')
 
     const load = async () => {
       // If this account signed up with an invite code but had to confirm
@@ -62,7 +64,10 @@ export default function App() {
       const household = await fetchHousehold(session.user.id, session.user.email)
       if (!cancelled) setDb(household)
     }
-    load().catch(console.error)
+    load().catch(err => {
+      console.error(err)
+      if (!cancelled) setLoadError(err.message || String(err))
+    })
 
     return () => {
       cancelled = true
@@ -482,6 +487,23 @@ export default function App() {
 
   if (session === undefined) {
     return <div className="w-full min-h-[300px]" />
+  }
+
+  if (session && loadError) {
+    return (
+      <div className="w-full min-h-[300px] flex items-center justify-center p-6">
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-red-200 max-w-md w-full text-center space-y-3">
+          <p className="text-sm font-semibold text-red-600">{t.loadErrorTitle}</p>
+          <p className="text-xs text-slate-500">{loadError}</p>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-sm font-bold text-brand-600 hover:text-brand-700"
+          >
+            {t.loadErrorLogoutBtn}
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (!session || !db) {
