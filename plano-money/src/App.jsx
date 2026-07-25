@@ -8,6 +8,7 @@ import { dbApi, fetchHousehold } from './lib/db.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import ResetPasswordScreen from './components/ResetPasswordScreen.jsx'
 import Header from './components/Header.jsx'
+import BottomNav from './components/BottomNav.jsx'
 import CoachAlert from './components/CoachAlert.jsx'
 import DashboardView from './components/DashboardView.jsx'
 import ExpensesView from './components/ExpensesView.jsx'
@@ -525,6 +526,8 @@ export default function App() {
             />
           </div>
         )}
+
+        <BottomNav t={t} activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
     </div>
   )
