@@ -73,6 +73,7 @@ export default function IncomeView({ t, db, lang, addFixedIncome, removeFixedInc
           <h3 className="text-base sm:text-lg font-bold text-navy-900">{t.fixedIncomeTitle}</h3>
           <VoiceButton t={t} lang={lang} onTranscript={handleFixedTranscript} />
         </div>
+        <p className="text-xs text-slate-400 -mt-2">{t.fixedIncomeHint}</p>
         <VoiceConfirmationBanner message={fixedVoiceMsg} />
         <form onSubmit={submitFixed} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <input

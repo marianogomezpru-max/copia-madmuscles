@@ -3,13 +3,19 @@ import TransactionForm from './TransactionForm.jsx'
 import { CATEGORIES, CATEGORY_COLORS, CURRENCY_SYMBOLS } from '../constants.js'
 import { formatMoney } from '../utils/format.js'
 
-export default function ExpensesView({ t, db, lang, addExpense, removeExpense, updateBudget }) {
+export default function ExpensesView({ t, db, lang, isAdmin, activeProfileId, addExpense, removeExpense, updateBudget }) {
   const sorted = [...db.expenseTransactions].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
   const profileName = profileId => db.profiles.find(p => p.id === profileId)?.name
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <TransactionForm t={t} lang={lang} onAdd={addExpense} />
+      <TransactionForm
+        t={t}
+        lang={lang}
+        onAdd={addExpense}
+        profiles={isAdmin ? db.profiles : null}
+        activeProfileId={activeProfileId}
+      />
 
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
         <h3 className="text-base sm:text-lg font-bold text-navy-900 mb-4">{t.recentTransactions}</h3>

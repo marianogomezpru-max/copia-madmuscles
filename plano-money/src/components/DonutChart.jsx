@@ -43,13 +43,15 @@ export default function DonutChart({ t, totalsByGroup, total, lang }) {
                 r={RADIUS}
                 fill="none"
                 stroke={GROUP_COLORS[arc.group].light}
-                strokeWidth={hovered === arc.group ? STROKE + 6 : STROKE}
+                strokeWidth={STROKE}
                 strokeDasharray={`${arc.length} ${CIRCUMFERENCE - arc.length}`}
                 strokeDashoffset={-arc.offset}
                 strokeLinecap="round"
+                opacity={hovered && hovered !== arc.group ? 0.45 : 1}
                 onMouseEnter={() => setHovered(arc.group)}
                 onMouseLeave={() => setHovered(null)}
-                style={{ transition: 'stroke-width 0.15s ease', cursor: 'pointer' }}
+                onClick={() => setHovered(prev => (prev === arc.group ? null : arc.group))}
+                style={{ transition: 'opacity 0.15s ease', cursor: 'pointer' }}
               />
             ))}
           </g>

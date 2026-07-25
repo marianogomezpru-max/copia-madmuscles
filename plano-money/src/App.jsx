@@ -97,13 +97,15 @@ export default function App() {
   const handleLogout = () => setDb(prev => ({ ...prev, userProfile: null, activeProfileId: null }))
   const setLanguage = language => setDb(prev => ({ ...prev, language }))
 
-  // Expenses
-  const addExpense = ({ amount, categoryId, date, note, photo }) => {
+  // Expenses. profileId lets an admin log an expense on behalf of another
+  // household member (regular members can only log their own — the form
+  // only offers the picker to admins) — defaults to whoever's logged in.
+  const addExpense = ({ amount, categoryId, date, note, photo, profileId }) => {
     setDb(prev => ({
       ...prev,
       expenseTransactions: [
         ...prev.expenseTransactions,
-        { id: uid(), amount, categoryId, date, note, photo: photo || null, profileId: prev.activeProfileId },
+        { id: uid(), amount, categoryId, date, note, photo: photo || null, profileId: profileId || prev.activeProfileId },
       ],
     }))
   }
@@ -188,6 +190,55 @@ export default function App() {
     const a = document.createElement('a')
     a.href = url
     a.download = `plano-money-backup-${toISODate(new Date())}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // Human-readable spreadsheet of the user's own data (opens in Excel/Sheets)
+  // — separate from the JSON backup above, which is a full app-state dump
+  // meant only for restoring into Plano.Money itself.
+  const exportCSV = () => {
+    const profileName = id => db.profiles.find(p => p.id === id)?.name || ''
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`
+    const row = cells => cells.map(esc).join(',')
+    const lines = []
+
+    lines.push(row([t.csvSectionExpenses]))
+    lines.push(row([t.datePlaceholder, t.categoryPlaceholder, t.csvAmount, t.csvNote, t.csvProfile]))
+    db.expenseTransactions.forEach(tx => {
+      lines.push(row([tx.date, t.categories[tx.categoryId] || tx.categoryId, tx.amount, tx.note || '', profileName(tx.profileId)]))
+    })
+
+    lines.push('')
+    lines.push(row([t.csvSectionFixedIncome]))
+    lines.push(row([t.csvName, t.csvAmount]))
+    db.fixedIncomes.forEach(i => lines.push(row([i.name, i.amount])))
+
+    lines.push('')
+    lines.push(row([t.csvSectionVariableIncome]))
+    lines.push(row([t.datePlaceholder, t.csvName, t.csvAmount]))
+    db.variableIncomeTransactions.forEach(i => lines.push(row([i.date, i.name, i.amount])))
+
+    lines.push('')
+    lines.push(row([t.csvSectionSavings]))
+    lines.push(row([t.csvName, t.csvAmount]))
+    db.savings.forEach(s => lines.push(row([s.name, s.amount])))
+
+    lines.push('')
+    lines.push(row([t.csvSectionInvestments]))
+    lines.push(row([t.csvType, t.csvName, t.csvAmount]))
+    db.investments.forEach(i => lines.push(row([t.investmentTypes[i.type] || i.type, i.name, i.amount])))
+
+    lines.push('')
+    lines.push(row([t.csvSectionGoals]))
+    lines.push(row([t.csvName, t.csvTarget, t.csvSaved]))
+    db.goals.forEach(g => lines.push(row([g.name, g.target, g.saved])))
+
+    const blob = new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `plano-money-datos-${toISODate(new Date())}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -328,6 +379,7 @@ export default function App() {
         setMobileMenuOpen={setMobileMenuOpen}
         onExportData={exportData}
         onImportData={importData}
+        onExportCSV={exportCSV}
       />
 
       <div className="p-4 sm:p-6 space-y-6">
@@ -351,7 +403,16 @@ export default function App() {
         )}
 
         {activeTab === 'gastos' && (
-          <ExpensesView t={t} db={db} lang={db.language} addExpense={addExpense} removeExpense={removeExpense} updateBudget={updateBudget} />
+          <ExpensesView
+            t={t}
+            db={db}
+            lang={db.language}
+            isAdmin={isAdmin}
+            activeProfileId={db.activeProfileId}
+            addExpense={addExpense}
+            removeExpense={removeExpense}
+            updateBudget={updateBudget}
+          />
         )}
 
         {activeTab === 'ingresos' && (

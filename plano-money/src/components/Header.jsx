@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Download, Globe, LogOut, Menu, Upload, X } from 'lucide-react'
+import { Download, FileSpreadsheet, Globe, LogOut, Menu, Upload, X } from 'lucide-react'
 import Logo from './Logo.jsx'
 
 export default function Header({
@@ -14,6 +14,7 @@ export default function Header({
   setMobileMenuOpen,
   onExportData,
   onImportData,
+  onExportCSV,
 }) {
   const fileInputRef = useRef(null)
 
@@ -48,6 +49,15 @@ export default function Header({
               <option value="pt" className="bg-navy-900">Português</option>
             </select>
           </div>
+
+          <button
+            onClick={onExportCSV}
+            aria-label={t.exportCsvBtn}
+            title={t.exportCsvBtn}
+            className="flex items-center gap-1 bg-navy-800 hover:bg-navy-700 text-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors border border-navy-700 shrink-0"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
 
           <button
             onClick={onExportData}

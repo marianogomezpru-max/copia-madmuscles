@@ -17,7 +17,11 @@ export function listenOnce(lang = 'es') {
     recognition.onresult = e => resolve(e.results[0][0].transcript)
     recognition.onerror = e => reject(e.error)
     recognition.onend = () => {}
-    recognition.start()
+    try {
+      recognition.start()
+    } catch {
+      reject('start-failed')
+    }
   })
 }
 

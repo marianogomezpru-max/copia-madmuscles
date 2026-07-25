@@ -12,8 +12,8 @@ const SEVERITY = {
 }
 
 function severityFor(pct) {
-  if (pct > 100) return 'critical'
-  if (pct >= 75) return 'warning'
+  if (pct > 90) return 'critical'
+  if (pct > 60) return 'warning'
   return 'good'
 }
 

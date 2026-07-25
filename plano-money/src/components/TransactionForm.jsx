@@ -8,13 +8,14 @@ import { toISODate } from '../utils/periods.js'
 import VoiceButton from './VoiceButton.jsx'
 import VoiceConfirmationBanner from './VoiceConfirmationBanner.jsx'
 
-export default function TransactionForm({ t, lang, onAdd }) {
+export default function TransactionForm({ t, lang, onAdd, profiles, activeProfileId }) {
   const [amount, setAmount] = useState('')
   const [categoryId, setCategoryId] = useState(CATEGORIES[0].id)
   const [date, setDate] = useState(toISODate(new Date()))
   const [note, setNote] = useState('')
   const [photo, setPhoto] = useState(null)
   const [voiceMessage, setVoiceMessage] = useState(null)
+  const [profileId, setProfileId] = useState(activeProfileId || '')
   const fileInputRef = useRef(null)
 
   const reset = () => {
@@ -28,7 +29,7 @@ export default function TransactionForm({ t, lang, onAdd }) {
     e.preventDefault()
     const num = Number(amount)
     if (!Number.isFinite(num) || num <= 0) return
-    onAdd({ amount: num, categoryId, date, note: note.trim(), photo })
+    onAdd({ amount: num, categoryId, date, note: note.trim(), photo, profileId: profileId || activeProfileId })
     reset()
   }
 
@@ -42,7 +43,7 @@ export default function TransactionForm({ t, lang, onAdd }) {
 
     if (Number.isFinite(num) && num > 0) {
       const today = toISODate(new Date())
-      onAdd({ amount: num, categoryId: resolvedCategory, date: today, note: phrase, photo: null })
+      onAdd({ amount: num, categoryId: resolvedCategory, date: today, note: phrase, photo: null, profileId: profileId || activeProfileId })
       setVoiceMessage(`${formatMoney(num, lang)} · ${t.categories[resolvedCategory] || resolvedCategory}`)
       setTimeout(() => setVoiceMessage(null), 4000)
     } else {
@@ -81,6 +82,21 @@ export default function TransactionForm({ t, lang, onAdd }) {
         <div className="flex items-center gap-3">
           <img src={photo} alt="" className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
           <p className="text-xs text-slate-400">{t.photoAiNote}</p>
+        </div>
+      )}
+
+      {profiles && profiles.length > 1 && (
+        <div>
+          <label className="text-xs font-bold text-slate-500 uppercase block mb-1.5">{t.assignedProfileLabel}</label>
+          <select
+            value={profileId || activeProfileId}
+            onChange={e => setProfileId(e.target.value)}
+            className="w-full sm:w-auto px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+          >
+            {profiles.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
         </div>
       )}
 

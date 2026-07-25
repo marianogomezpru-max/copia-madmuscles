@@ -14,8 +14,12 @@ export default function VoiceButton({ t, lang, onTranscript, className = '' }) {
     try {
       const phrase = await listenOnce(lang)
       onTranscript(phrase)
-    } catch {
-      // user cancelled or no speech detected — nothing to do
+    } catch (err) {
+      // 'no-speech' / 'aborted' just mean the user didn't say anything or
+      // cancelled — not worth interrupting them with an alert for that.
+      if (err === 'not-allowed' || err === 'service-not-allowed') alert(t.voiceErrorPermission)
+      else if (err === 'network') alert(t.voiceErrorNetwork)
+      else if (err && err !== 'no-speech' && err !== 'aborted') alert(t.voiceErrorGeneric)
     } finally {
       setListening(false)
     }
