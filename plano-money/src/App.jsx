@@ -513,6 +513,23 @@ export default function App() {
     return <LoginScreen t={t} lang={db?.language || 'es'} />
   }
 
+  if (db.accessSuspended) {
+    return (
+      <div className="w-full min-h-[300px] flex items-center justify-center p-6">
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-amber-200 max-w-md w-full text-center space-y-3">
+          <p className="text-sm font-semibold text-amber-600">{t.accessSuspendedTitle}</p>
+          <p className="text-xs text-slate-500">{t.accessSuspendedMessage}</p>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            className="text-sm font-bold text-brand-600 hover:text-brand-700"
+          >
+            {t.accessSuspendedLogoutBtn}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-6xl mx-auto bg-slate-50 border border-slate-200 rounded-2xl shadow-2xl overflow-hidden font-sans text-slate-800 my-2 sm:my-4">
       <Header

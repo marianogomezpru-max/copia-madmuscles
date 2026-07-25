@@ -45,6 +45,7 @@ export async function fetchHousehold(userId, email) {
     userProfile: { name: myProfile?.name || '', email },
     language: settingsRow.data?.language || 'es',
     inviteCode: settingsRow.data?.invite_code || null,
+    accessSuspended: !!settingsRow.data?.access_suspended,
     activeProfileId: myProfile?.id || null,
     profiles: householdProfiles.map(p => ({
       id: p.id,
