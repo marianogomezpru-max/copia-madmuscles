@@ -2,12 +2,15 @@ import { useState } from 'react'
 import { LogIn, UserPlus } from 'lucide-react'
 import Logo from './Logo.jsx'
 import { supabase } from '../lib/supabaseClient.js'
+import { joinHousehold } from '../lib/db.js'
+import { PENDING_JOIN_KEY } from '../lib/pendingJoin.js'
 
 export default function LoginScreen({ t }) {
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [inviteCode, setInviteCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -19,13 +22,29 @@ export default function LoginScreen({ t }) {
     setLoading(true)
     try {
       if (mode === 'signup') {
+        const trimmedCode = inviteCode.trim()
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
           password,
           options: { data: { full_name: fullName.trim() } },
         })
         if (signUpError) throw signUpError
-        if (!data.session) setMessage(t.authCheckEmail)
+
+        if (!data.session) {
+          // Confirming the email happens outside this tab, so there's no
+          // session yet to run the join RPC under — App.jsx finishes it
+          // automatically the moment a session shows up.
+          if (trimmedCode) {
+            localStorage.setItem(PENDING_JOIN_KEY, JSON.stringify({ inviteCode: trimmedCode, displayName: fullName.trim() }))
+          }
+          setMessage(t.authCheckEmail)
+        } else if (trimmedCode) {
+          try {
+            await joinHousehold(trimmedCode, fullName.trim())
+          } catch (joinErr) {
+            setError(joinErr.message === 'invalid_invite_code' ? t.joinErrorInvalidCode : t.joinErrorGeneric)
+          }
+        }
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim().toLowerCase(),
@@ -97,6 +116,18 @@ export default function LoginScreen({ t }) {
                 placeholder={t.namePlaceholder}
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
               />
+            </div>
+          )}
+          {mode === 'signup' && (
+            <div className="text-left">
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={e => setInviteCode(e.target.value)}
+                placeholder={t.inviteCodeFieldPlaceholder}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:outline-none font-medium text-sm sm:text-base"
+              />
+              <p className="text-xs text-slate-400 mt-1 ml-1">{t.inviteCodeFieldHint}</p>
             </div>
           )}
           <div className="text-left">

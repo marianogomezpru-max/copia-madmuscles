@@ -14,7 +14,11 @@ export default function Header({
   setMobileMenuOpen,
   onExportCSV,
   onExportPDF,
+  isAdmin,
 }) {
+  // Only the admin manages who's in the household and what they can see.
+  const tabs = Object.entries(t.tabs).filter(([key]) => isAdmin || key !== 'perfiles')
+
   return (
     <>
       <div className="bg-navy-900 text-white px-4 sm:px-6 py-4 flex flex-wrap justify-between items-center gap-3 border-b border-navy-800">
@@ -71,7 +75,7 @@ export default function Header({
 
         {mobileMenuOpen && (
           <div className="flex flex-col md:hidden border-t border-slate-100 bg-slate-50 p-2 space-y-1">
-            {Object.entries(t.tabs).map(([key, label]) => (
+            {tabs.map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => { setActiveTab(key); setMobileMenuOpen(false) }}
@@ -84,7 +88,7 @@ export default function Header({
         )}
 
         <div className="hidden md:flex flex-wrap">
-          {Object.entries(t.tabs).map(([key, label]) => (
+          {tabs.map(([key, label]) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}

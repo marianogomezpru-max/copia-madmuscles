@@ -3,7 +3,7 @@ import TransactionForm from './TransactionForm.jsx'
 import { CATEGORIES, CATEGORY_COLORS, CURRENCY_SYMBOLS } from '../constants.js'
 import { formatMoney } from '../utils/format.js'
 
-export default function ExpensesView({ t, db, lang, isAdmin, activeProfileId, addExpense, removeExpense, updateBudget }) {
+export default function ExpensesView({ t, db, lang, isFullAccess, activeProfileId, addExpense, removeExpense, updateBudget }) {
   const sorted = [...db.expenseTransactions].sort((a, b) => (a.date < b.date ? 1 : -1)).slice(0, 30)
   const profileName = profileId => db.profiles.find(p => p.id === profileId)?.name
 
@@ -13,7 +13,7 @@ export default function ExpensesView({ t, db, lang, isAdmin, activeProfileId, ad
         t={t}
         lang={lang}
         onAdd={addExpense}
-        profiles={isAdmin ? db.profiles : null}
+        profiles={isFullAccess ? db.profiles : null}
         activeProfileId={activeProfileId}
       />
 
@@ -39,6 +39,11 @@ export default function ExpensesView({ t, db, lang, isAdmin, activeProfileId, ad
                           {profileName(tx.profileId)}
                         </span>
                       )}
+                      {tx.isPersonal && (
+                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full bg-lila-500/10 text-lila-600 shrink-0">
+                          {t.personalBadge}
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-slate-400">{tx.date}{tx.note ? ` · ${tx.note}` : ''}</p>
                   </div>
@@ -55,6 +60,7 @@ export default function ExpensesView({ t, db, lang, isAdmin, activeProfileId, ad
         )}
       </div>
 
+      {isFullAccess && (
       <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
         <h3 className="text-base sm:text-lg font-bold text-navy-900 mb-4">{t.budgetsTitle}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -80,6 +86,7 @@ export default function ExpensesView({ t, db, lang, isAdmin, activeProfileId, ad
           ))}
         </div>
       </div>
+      )}
     </div>
   )
 }

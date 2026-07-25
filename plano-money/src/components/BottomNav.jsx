@@ -1,12 +1,13 @@
-export default function BottomNav({ t, activeTab, setActiveTab }) {
+export default function BottomNav({ t, activeTab, setActiveTab, isAdmin }) {
   const handleSelect = key => {
     setActiveTab(key)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+  const tabs = Object.entries(t.tabs).filter(([key]) => isAdmin || key !== 'perfiles')
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-2 flex flex-wrap gap-2 justify-center">
-      {Object.entries(t.tabs).map(([key, label]) => (
+      {tabs.map(([key, label]) => (
         <button
           key={key}
           onClick={() => handleSelect(key)}

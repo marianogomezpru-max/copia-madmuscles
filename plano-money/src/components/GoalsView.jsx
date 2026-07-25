@@ -94,6 +94,22 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
               className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-brand-500"
             />
           </div>
+          <div className="flex bg-slate-100 rounded-xl p-1">
+            <button
+              type="button"
+              onClick={() => setNewGoal({ ...newGoal, isFamily: true })}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${newGoal.isFamily ? 'bg-white shadow-sm text-navy-900' : 'text-slate-500'}`}
+            >
+              {t.goalFamilyOption}
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewGoal({ ...newGoal, isFamily: false })}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-colors ${!newGoal.isFamily ? 'bg-white shadow-sm text-navy-900' : 'text-slate-500'}`}
+            >
+              {t.goalPersonalOption}
+            </button>
+          </div>
           <button
             type="submit"
             className="w-full bg-celeste-500 hover:bg-celeste-600 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base"
@@ -113,7 +129,12 @@ export default function GoalsView({ t, db, newGoal, setNewGoal, addGoal, addGoal
           return (
             <div key={g.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
               <div className="flex justify-between items-center">
-                <h4 className="font-bold text-navy-900 text-sm sm:text-base">{g.name}</h4>
+                <h4 className="font-bold text-navy-900 text-sm sm:text-base flex items-center gap-2">
+                  {g.name}
+                  <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full shrink-0 ${g.profileId ? 'bg-lila-500/10 text-lila-600' : 'bg-emerald-500/10 text-emerald-600'}`}>
+                    {g.profileId ? t.goalPersonalOption : t.goalFamilyOption}
+                  </span>
+                </h4>
                 <button onClick={() => removeGoal(g.id)} aria-label="Remove" className="text-red-400 hover:text-red-600 p-1">
                   <Trash2 className="w-4 h-4" />
                 </button>

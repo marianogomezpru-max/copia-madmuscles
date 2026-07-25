@@ -4,7 +4,8 @@ import { TRANSLATIONS } from './i18n.js'
 import { formatMoney, parseNonNegativeNumber } from './utils/format.js'
 import { enumerateMonthKeys, getPeriodMonthKeys, getPeriodRange, inRange, isCurrentMonth, monthKey, toISODate } from './utils/periods.js'
 import { supabase } from './lib/supabaseClient.js'
-import { dbApi, fetchHousehold } from './lib/db.js'
+import { dbApi, fetchHousehold, joinHousehold } from './lib/db.js'
+import { PENDING_JOIN_KEY } from './lib/pendingJoin.js'
 import LoginScreen from './components/LoginScreen.jsx'
 import ResetPasswordScreen from './components/ResetPasswordScreen.jsx'
 import Header from './components/Header.jsx'
@@ -26,7 +27,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [period, setPeriod] = useState('mensual')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [newGoal, setNewGoal] = useState({ name: '', target: '', saved: '' })
+  const [newGoal, setNewGoal] = useState({ name: '', target: '', saved: '', isFamily: true })
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session))
@@ -40,7 +41,32 @@ export default function App() {
 
   useEffect(() => {
     if (!session?.user) return
-    fetchHousehold(session.user.id, session.user.email).then(setDb).catch(console.error)
+    let cancelled = false
+
+    const load = async () => {
+      // If this account signed up with an invite code but had to confirm
+      // its email first, it still only has its own (empty, unused) solo
+      // household at this point — finish linking it into the real one now
+      // that there's an authenticated session to run the join under.
+      const pending = localStorage.getItem(PENDING_JOIN_KEY)
+      if (pending) {
+        try {
+          const { inviteCode, displayName } = JSON.parse(pending)
+          await joinHousehold(inviteCode, displayName)
+        } catch (err) {
+          console.error('Pending household join failed:', err)
+        } finally {
+          localStorage.removeItem(PENDING_JOIN_KEY)
+        }
+      }
+      const household = await fetchHousehold(session.user.id, session.user.email)
+      if (!cancelled) setDb(household)
+    }
+    load().catch(console.error)
+
+    return () => {
+      cancelled = true
+    }
   }, [session?.user?.id])
 
   // Freeze the outgoing month's plan (fixed income / budgets / savings
@@ -48,7 +74,7 @@ export default function App() {
   // month, so editing those values later never rewrites how past months
   // are reported.
   useEffect(() => {
-    if (!db || !session?.user) return
+    if (!db || !session?.user || db.isMember) return
     const currentKey = monthKey(toISODate(new Date()))
     if (db.lastSeenMonth === currentKey) return
 
@@ -69,7 +95,7 @@ export default function App() {
         patch.monthly_snapshots = monthlySnapshots
       }
     }
-    dbApi.upsertSettings(session.user.id, patch).then(({ error }) => {
+    dbApi.upsertSettings(db.householdOwnerId, patch).then(({ error }) => {
       if (error) return console.error(error)
       setDb(prev => ({ ...prev, lastSeenMonth: currentKey, monthlySnapshots }))
     })
@@ -79,28 +105,38 @@ export default function App() {
   const t = TRANSLATIONS[db?.language] || TRANSLATIONS.es
   const activeProfile = db?.profiles.find(p => p.id === db.activeProfileId) || null
   const isAdmin = activeProfile?.role === 'admin'
-  const visibleCategoryIds = !activeProfile || isAdmin || activeProfile.visibleCategories === null
+  // A full-access member (e.g. a spouse) sees the same household financials
+  // as the admin — fixed income, budgets, savings, every category — without
+  // being able to manage OTHER people's permissions the way the admin can.
+  const isFullAccess = isAdmin || !!activeProfile?.fullAccess
+  const visibleCategoryIds = !activeProfile || isFullAccess || activeProfile.visibleCategories === null
     ? CATEGORY_IDS
     : activeProfile.visibleCategories
 
   const handleLogout = () => supabase.auth.signOut()
   const setLanguage = language => {
     setDb(prev => ({ ...prev, language }))
-    dbApi.upsertSettings(session.user.id, { language }).then(({ error }) => error && console.error(error))
+    // Members have no write access to the household's settings row — the
+    // language choice just stays a local display preference for them.
+    if (isAdmin) {
+      dbApi.upsertSettings(db.householdOwnerId, { language }).then(({ error }) => error && console.error(error))
+    }
   }
 
-  // Expenses. profileId lets an admin log an expense on behalf of another
-  // household member — defaults to whoever's logged in.
-  const addExpense = async ({ amount, categoryId, date, note, photo, profileId }) => {
-    const { data, error } = await dbApi.addExpense(session.user.id, {
-      amount, categoryId, date, note, photo, profileId: profileId || db.activeProfileId,
+  // Expenses. profileId lets an admin/full-access member log an expense on
+  // behalf of another household member — defaults to whoever's logged in.
+  // isPersonal marks it as that person's own private tracking, excluded
+  // from every shared/family total.
+  const addExpense = async ({ amount, categoryId, date, note, photo, profileId, isPersonal }) => {
+    const { data, error } = await dbApi.addExpense(db.householdOwnerId, {
+      amount, categoryId, date, note, photo, profileId: profileId || db.activeProfileId, isPersonal,
     })
     if (error) return console.error(error)
     setDb(prev => ({
       ...prev,
       expenseTransactions: [
         ...prev.expenseTransactions,
-        { id: data.id, amount, categoryId, date, note, photo: photo || null, profileId: profileId || prev.activeProfileId },
+        { id: data.id, amount, categoryId, date, note, photo: photo || null, profileId: profileId || prev.activeProfileId, isPersonal: !!isPersonal },
       ],
     }))
   }
@@ -117,15 +153,15 @@ export default function App() {
       return { ...prev, budgets }
     })
     if (value === '') {
-      dbApi.deleteBudget(session.user.id, categoryId).then(({ error }) => error && console.error(error))
+      dbApi.deleteBudget(db.householdOwnerId, categoryId).then(({ error }) => error && console.error(error))
     } else {
-      dbApi.upsertBudget(session.user.id, categoryId, parseNonNegativeNumber(value)).then(({ error }) => error && console.error(error))
+      dbApi.upsertBudget(db.householdOwnerId, categoryId, parseNonNegativeNumber(value)).then(({ error }) => error && console.error(error))
     }
   }
 
   // Income
   const addFixedIncome = async ({ name, amount }) => {
-    const { data, error } = await dbApi.addFixedIncome(session.user.id, { name, amount })
+    const { data, error } = await dbApi.addFixedIncome(db.householdOwnerId, { name, amount })
     if (error) return console.error(error)
     setDb(prev => ({ ...prev, fixedIncomes: [...prev.fixedIncomes, { id: data.id, name, amount }] }))
   }
@@ -133,10 +169,17 @@ export default function App() {
     setDb(prev => ({ ...prev, fixedIncomes: prev.fixedIncomes.filter(i => i.id !== id) }))
     dbApi.removeFixedIncome(id).then(({ error }) => error && console.error(error))
   }
-  const addVariableIncome = async ({ name, amount, date }) => {
-    const { data, error } = await dbApi.addVariableIncome(session.user.id, { name, amount, date })
+  // Anyone in the household can log variable income under their own name
+  // (allowance, a gift, a side job) — family-scoped ones count toward the
+  // shared total, personal ones stay private to whoever logged them.
+  const addVariableIncome = async ({ name, amount, date, isPersonal }) => {
+    const profileId = db.activeProfileId
+    const { data, error } = await dbApi.addVariableIncome(db.householdOwnerId, { name, amount, date, profileId, isPersonal })
     if (error) return console.error(error)
-    setDb(prev => ({ ...prev, variableIncomeTransactions: [...prev.variableIncomeTransactions, { id: data.id, name, amount, date }] }))
+    setDb(prev => ({
+      ...prev,
+      variableIncomeTransactions: [...prev.variableIncomeTransactions, { id: data.id, name, amount, date, profileId, isPersonal: !!isPersonal }],
+    }))
   }
   const removeVariableIncome = id => {
     setDb(prev => ({ ...prev, variableIncomeTransactions: prev.variableIncomeTransactions.filter(i => i.id !== id) }))
@@ -146,7 +189,7 @@ export default function App() {
   // Profiles
   const addProfile = async name => {
     if (db.profiles.some(p => p.name.toLowerCase() === name.toLowerCase())) return
-    const { data, error } = await dbApi.addProfile(session.user.id, name)
+    const { data, error } = await dbApi.addProfile(db.householdOwnerId, name)
     if (error) return console.error(error)
     setDb(prev => ({ ...prev, profiles: [...prev.profiles, { id: data.id, name, role: 'member', visibleCategories: null }] }))
   }
@@ -167,12 +210,26 @@ export default function App() {
       return { ...prev, profiles }
     })
   }
+  const toggleProfileFullAccess = profileId => {
+    setDb(prev => {
+      let nextValue = false
+      const profiles = prev.profiles.map(p => {
+        if (p.id !== profileId) return p
+        nextValue = !p.fullAccess
+        return { ...p, fullAccess: nextValue }
+      })
+      dbApi.setProfileFullAccess(profileId, nextValue).then(({ error }) => error && console.error(error))
+      return { ...prev, profiles }
+    })
+  }
 
-  // Goals
-  const addGoalDirect = async ({ name, target, saved }) => {
-    const { data, error } = await dbApi.addGoal(session.user.id, { name, target, saved })
+  // Goals. profileId null = a shared "family" goal everyone in the
+  // household can see and contribute to; set = a personal goal private to
+  // that one profile (and the admin, who sees everything regardless).
+  const addGoalDirect = async ({ name, target, saved, profileId }) => {
+    const { data, error } = await dbApi.addGoal(db.householdOwnerId, { name, target, saved, profileId })
     if (error) return console.error(error)
-    setDb(prev => ({ ...prev, goals: [...prev.goals, { id: data.id, name, target, saved: saved || 0 }] }))
+    setDb(prev => ({ ...prev, goals: [...prev.goals, { id: data.id, name, target, saved: saved || 0, profileId: profileId || null }] }))
   }
   const addGoal = e => {
     e.preventDefault()
@@ -180,8 +237,8 @@ export default function App() {
     const target = parseNonNegativeNumber(newGoal.target)
     const saved = parseNonNegativeNumber(newGoal.saved)
     if (name && target > 0) {
-      addGoalDirect({ name, target, saved })
-      setNewGoal({ name: '', target: '', saved: '' })
+      addGoalDirect({ name, target, saved, profileId: newGoal.isFamily ? null : db.activeProfileId })
+      setNewGoal({ name: '', target: '', saved: '', isFamily: true })
     }
   }
   const removeGoal = id => {
@@ -202,7 +259,7 @@ export default function App() {
   // the same pattern as expenses and variable income.
   const addSaving = async ({ name, amount }) => {
     const date = toISODate(new Date())
-    const { data, error } = await dbApi.addSaving(session.user.id, { name, amount, date })
+    const { data, error } = await dbApi.addSaving(db.householdOwnerId, { name, amount, date })
     if (error) return console.error(error)
     setDb(prev => ({ ...prev, savings: [...prev.savings, { id: data.id, name, amount, date }] }))
   }
@@ -212,7 +269,7 @@ export default function App() {
   }
   const addInvestment = async ({ type, name, amount }) => {
     const date = toISODate(new Date())
-    const { data, error } = await dbApi.addInvestment(session.user.id, { type, name, amount, date })
+    const { data, error } = await dbApi.addInvestment(db.householdOwnerId, { type, name, amount, date })
     if (error) return console.error(error)
     setDb(prev => ({ ...prev, investments: [...prev.investments, { id: data.id, type, name, amount, date }] }))
   }
@@ -223,7 +280,7 @@ export default function App() {
   const setMonthlySavingsGoal = value => {
     const amount = parseNonNegativeNumber(value)
     setDb(prev => ({ ...prev, monthlySavingsGoal: amount }))
-    dbApi.upsertSettings(session.user.id, { monthly_savings_goal: amount }).then(({ error }) => error && console.error(error))
+    dbApi.upsertSettings(db.householdOwnerId, { monthly_savings_goal: amount }).then(({ error }) => error && console.error(error))
   }
 
   // Human-readable spreadsheet of the user's own data (opens in Excel/Sheets).
@@ -328,7 +385,10 @@ export default function App() {
   } = useMemo(() => {
     if (!db) return {}
     const [start, end] = getPeriodRange(period)
-    const visibleTx = db.expenseTransactions.filter(tx => visibleCategoryIds.includes(tx.categoryId))
+    // Personal expenses/income are that one person's own private tracking —
+    // never counted in the shared family totals below, only in their own
+    // "Movimientos" list (still visible there, just excluded from the math).
+    const visibleTx = db.expenseTransactions.filter(tx => !tx.isPersonal && visibleCategoryIds.includes(tx.categoryId))
     const periodTx = visibleTx.filter(tx => inRange(tx.date, start, end))
 
     const groupTotals = {}
@@ -363,7 +423,7 @@ export default function App() {
     })
 
     const variableSum = db.variableIncomeTransactions
-      .filter(i => inRange(i.date, start, end))
+      .filter(i => !i.isPersonal && inRange(i.date, start, end))
       .reduce((a, i) => a + i.amount, 0)
     const incomeSum = fixedSum + variableSum
 
@@ -379,7 +439,7 @@ export default function App() {
 
     const monthTotals = {}
     db.expenseTransactions.forEach(tx => {
-      if (!isCurrentMonth(tx.date)) return
+      if (tx.isPersonal || !isCurrentMonth(tx.date)) return
       monthTotals[tx.categoryId] = (monthTotals[tx.categoryId] || 0) + tx.amount
     })
     const alerts = Object.entries(db.budgets)
@@ -442,6 +502,7 @@ export default function App() {
         setMobileMenuOpen={setMobileMenuOpen}
         onExportCSV={exportCSV}
         onExportPDF={exportPDF}
+        isAdmin={isAdmin}
       />
 
       <div className="p-4 sm:p-6 space-y-6">
@@ -469,7 +530,7 @@ export default function App() {
             t={t}
             db={db}
             lang={db.language}
-            isAdmin={isAdmin}
+            isFullAccess={isFullAccess}
             activeProfileId={db.activeProfileId}
             addExpense={addExpense}
             removeExpense={removeExpense}
@@ -482,6 +543,7 @@ export default function App() {
             t={t}
             db={db}
             lang={db.language}
+            isFullAccess={isFullAccess}
             addFixedIncome={addFixedIncome}
             removeFixedIncome={removeFixedIncome}
             addVariableIncome={addVariableIncome}
@@ -489,7 +551,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'perfiles' && (
+        {activeTab === 'perfiles' && isAdmin && (
           <ProfilesView
             t={t}
             db={db}
@@ -498,6 +560,7 @@ export default function App() {
             addProfile={addProfile}
             removeProfile={removeProfile}
             toggleProfileCategory={toggleProfileCategory}
+            toggleProfileFullAccess={toggleProfileFullAccess}
           />
         )}
 
@@ -514,20 +577,22 @@ export default function App() {
               addGoalContribution={addGoalContribution}
               lang={db.language}
             />
-            <SavingsInvestmentsView
-              t={t}
-              db={db}
-              lang={db.language}
-              addSaving={addSaving}
-              removeSaving={removeSaving}
-              addInvestment={addInvestment}
-              removeInvestment={removeInvestment}
-              setMonthlySavingsGoal={setMonthlySavingsGoal}
-            />
+            {isFullAccess && (
+              <SavingsInvestmentsView
+                t={t}
+                db={db}
+                lang={db.language}
+                addSaving={addSaving}
+                removeSaving={removeSaving}
+                addInvestment={addInvestment}
+                removeInvestment={removeInvestment}
+                setMonthlySavingsGoal={setMonthlySavingsGoal}
+              />
+            )}
           </div>
         )}
 
-        <BottomNav t={t} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <BottomNav t={t} activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} />
       </div>
     </div>
   )

@@ -13,6 +13,7 @@ export default function TransactionForm({ t, lang, onAdd, profiles, activeProfil
   const [note, setNote] = useState('')
   const [voiceMessage, setVoiceMessage] = useState(null)
   const [profileId, setProfileId] = useState(activeProfileId || '')
+  const [isPersonal, setIsPersonal] = useState(false)
 
   const reset = () => {
     setAmount('')
@@ -24,7 +25,7 @@ export default function TransactionForm({ t, lang, onAdd, profiles, activeProfil
     e.preventDefault()
     const num = Number(amount)
     if (!Number.isFinite(num) || num <= 0) return
-    onAdd({ amount: num, categoryId, date, note: note.trim(), photo: null, profileId: profileId || activeProfileId })
+    onAdd({ amount: num, categoryId, date, note: note.trim(), photo: null, profileId: profileId || activeProfileId, isPersonal })
     reset()
   }
 
@@ -110,6 +111,16 @@ export default function TransactionForm({ t, lang, onAdd, profiles, activeProfil
           className="px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={isPersonal}
+          onChange={e => setIsPersonal(e.target.checked)}
+          className="w-4 h-4 rounded accent-lila-500"
+        />
+        {t.personalExpenseLabel}
+      </label>
 
       <button type="submit" className="w-full bg-celeste-500 hover:bg-celeste-600 text-white font-bold py-3 rounded-xl transition-all shadow-md text-sm sm:text-base">
         {t.addTransactionBtn}
