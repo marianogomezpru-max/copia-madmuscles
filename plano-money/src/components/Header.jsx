@@ -1,4 +1,4 @@
-import { FileSpreadsheet, FileText, LogOut, Menu, X } from 'lucide-react'
+import { FileSpreadsheet, FileText, LogOut, Menu, Plane, X } from 'lucide-react'
 import Logo from './Logo.jsx'
 import LanguageSwitcher from './LanguageSwitcher.jsx'
 
@@ -14,6 +14,7 @@ export default function Header({
   setMobileMenuOpen,
   onExportCSV,
   onExportPDF,
+  onOpenVacationControl,
   isAdmin,
 }) {
   // Only the admin manages who's in the household and what they can see.
@@ -31,6 +32,15 @@ export default function Header({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          {onOpenVacationControl && (
+            <button
+              onClick={onOpenVacationControl}
+              className="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold transition-colors shrink-0"
+            >
+              <Plane className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">{t.vacationControlBtn}</span>
+            </button>
+          )}
+
           <LanguageSwitcher language={language} onLanguageChange={onLanguageChange} />
 
           <button

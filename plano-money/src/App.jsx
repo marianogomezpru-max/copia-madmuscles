@@ -17,6 +17,7 @@ import IncomeView from './components/IncomeView.jsx'
 import ProfilesView from './components/ProfilesView.jsx'
 import GoalsView from './components/GoalsView.jsx'
 import SavingsInvestmentsView from './components/SavingsInvestmentsView.jsx'
+import VacationControlView from './components/VacationControlView.jsx'
 
 const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
@@ -26,6 +27,7 @@ export default function App() {
   const [db, setDb] = useState(null)
   const [loadError, setLoadError] = useState('')
   const [activeTab, setActiveTab] = useState('dashboard')
+  const [vacationMode, setVacationMode] = useState(false)
   const [period, setPeriod] = useState('mensual')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [newGoal, setNewGoal] = useState({ name: '', target: '', saved: '', isFamily: true })
@@ -524,9 +526,20 @@ export default function App() {
         setMobileMenuOpen={setMobileMenuOpen}
         onExportCSV={exportCSV}
         onExportPDF={exportPDF}
+        onOpenVacationControl={isFullAccess ? () => setVacationMode(true) : undefined}
         isAdmin={isAdmin}
       />
 
+      {vacationMode ? (
+        <VacationControlView
+          t={t}
+          lang={db.language}
+          householdOwnerId={db.householdOwnerId}
+          profiles={db.profiles}
+          activeProfileId={db.activeProfileId}
+          onClose={() => setVacationMode(false)}
+        />
+      ) : (
       <div className="p-4 sm:p-6 space-y-6">
         <CoachAlert t={t} alerts={coachAlerts} lang={db.language} />
 
@@ -616,6 +629,7 @@ export default function App() {
 
         <BottomNav t={t} activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} />
       </div>
+      )}
     </div>
   )
 }

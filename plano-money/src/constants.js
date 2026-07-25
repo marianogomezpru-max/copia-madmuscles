@@ -58,3 +58,20 @@ export const PERIODS = ['mensual', 'bimestral', 'trimestral', 'semestral', 'anua
 export const CURRENCY_SYMBOLS = { es: '$', en: '$', pt: 'R$' }
 
 export const INVESTMENT_TYPES = ['plazo_fijo', 'cripto', 'titulos', 'bonos', 'otro']
+
+// Control Vacaciones — a fully separate tracker with its own fixed budget
+// and category list, entirely outside the household's regular
+// expenses/categories (different table, different math, never summed
+// into the main Dashboard).
+export const VACATION_CATEGORY_IDS = [
+  'ropa', 'farmacia_perfumeria', 'peluqueria_unas', 'mantenimiento_auto_moto',
+  'pasaje_tren', 'pasaje_aereo', 'pasaje_micro', 'pasaje_ferry', 'uber_taxi',
+  'combustible', 'peajes', 'tasas_impuestos', 'alquiler', 'supermercado',
+  'carpa_parador', 'almuerzo', 'merienda', 'restaurante', 'salidas_paseos',
+  'excursiones', 'suvenir',
+]
+
+// Same green/yellow/red degree-vs-plan convention as Presupuesto vs. Real,
+// with the thresholds the user asked for specifically for vacation
+// spending: more headroom before it turns critical.
+export const VACATION_SEVERITY_THRESHOLDS = { warning: 65, critical: 87 }

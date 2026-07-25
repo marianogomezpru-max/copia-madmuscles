@@ -89,6 +89,43 @@ export async function joinHousehold(inviteCode, displayName) {
 
 const withOwner = (householdOwnerId, obj) => ({ ...obj, user_id: householdOwnerId })
 
+// Control Vacaciones lives entirely outside fetchHousehold — it's a
+// separate budget that never feeds into the household's regular totals,
+// so it's only fetched when that screen is actually opened.
+export async function fetchVacationTrips(householdOwnerId) {
+  const [trips, expenses] = await Promise.all([
+    supabase.from('vacation_trips').select('*').eq('user_id', householdOwnerId).order('created_at', { ascending: false }),
+    supabase.from('vacation_expenses').select('*').eq('user_id', householdOwnerId),
+  ])
+  if (trips.error) throw trips.error
+  if (expenses.error) throw expenses.error
+
+  return (trips.data || []).map(trip => ({
+    id: trip.id,
+    name: trip.name,
+    days: trip.days,
+    budget: Number(trip.budget),
+    expenses: (expenses.data || [])
+      .filter(e => e.trip_id === trip.id)
+      .map(e => ({
+        id: e.id, categoryId: e.category_id, amount: Number(e.amount), date: e.date,
+        note: e.note || '', profileId: e.profile_id,
+      })),
+  }))
+}
+
+export const vacationApi = {
+  addTrip: (householdOwnerId, { name, days, budget }) =>
+    supabase.from('vacation_trips').insert(withOwner(householdOwnerId, { name, days, budget })).select().single(),
+  removeTrip: id => supabase.from('vacation_trips').delete().eq('id', id),
+
+  addExpense: (householdOwnerId, { tripId, categoryId, amount, date, note, profileId }) =>
+    supabase.from('vacation_expenses').insert(withOwner(householdOwnerId, {
+      trip_id: tripId, category_id: categoryId, amount, date, note, profile_id: profileId,
+    })).select().single(),
+  removeExpense: id => supabase.from('vacation_expenses').delete().eq('id', id),
+}
+
 export const dbApi = {
   addExpense: (householdOwnerId, { amount, categoryId, date, note, photo, profileId, isPersonal }) =>
     supabase.from('expense_transactions').insert(withOwner(householdOwnerId, {
