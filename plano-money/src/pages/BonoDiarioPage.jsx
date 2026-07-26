@@ -122,7 +122,7 @@ function DiarioContent() {
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
           <Logo className="w-9 h-9" />
           <div>
-            <p className="font-bold text-navy-900">Emoción vs Dinero</p>
+            <p className="font-bold text-navy-900">Emoción y Dinero</p>
             <p className="text-xs text-slate-400">{filledDays} de 30 días completados</p>
           </div>
         </div>

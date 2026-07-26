@@ -56,7 +56,7 @@ function ContratoContent() {
         <div className="text-center">
           <Logo className="w-14 h-14 mx-auto mb-3" />
           <p className="text-xs font-bold uppercase text-brand-600">Contrato</p>
-          <h1 className="text-xl sm:text-2xl font-black text-navy-900">Mi Nueva Relación con el Dinero</h1>
+          <h1 className="text-xl sm:text-2xl font-black text-navy-900">Mi Nueva Relación con El Dinero</h1>
         </div>
 
         <div>

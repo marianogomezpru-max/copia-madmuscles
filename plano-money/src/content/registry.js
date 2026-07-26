@@ -8,11 +8,11 @@ export const CONTENT_REGISTRY = {
     path: '/domina-tu-dinero',
   },
   'bono-diario': {
-    title: 'Emoción vs Dinero',
+    title: 'Emoción y Dinero',
     path: '/bono-diario',
   },
   'bono-contrato': {
-    title: 'Mi Nueva Relación con el Dinero',
+    title: 'Mi Nueva Relación con El Dinero',
     path: '/bono-contrato',
   },
 }
