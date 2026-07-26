@@ -27,4 +27,16 @@ export const CONTENT_REGISTRY = {
     title: 'Mapa Mental del Dinero',
     path: '/bono-mapa-mental',
   },
+  'bono-quiz-comprador': {
+    title: '¿Qué Comprador Eres?',
+    path: '/bono-quiz-comprador',
+  },
+  'bono-reto-21-dias': {
+    title: '21 Días para Reprogramar tu Cerebro Financiero',
+    path: '/bono-reto-21-dias',
+  },
+  'bono-checklist-compra': {
+    title: 'Piensa Antes de Comprar',
+    path: '/bono-checklist-compra',
+  },
 }
