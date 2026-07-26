@@ -1,5 +1,6 @@
 import { issueAccessCode, setAccessSuspended } from '../_lib/supabaseAdmin.js'
-import { sendAccessCodeEmail } from '../_lib/email.js'
+import { sendAccessCodeEmail, sendContentAccessEmail } from '../_lib/email.js'
+import { contentProductMap, grantContentAccess } from '../_lib/contentAccess.js'
 
 // Hotmart sends its signing token ("Hottok", generated in
 // Ferramentas > Webhook of your Hotmart product) in this header — compare
@@ -38,10 +39,17 @@ export default async function handler(req, res) {
   const mainProductId = process.env.HOTMART_PRODUCT_ID
   const isMainProduct = !mainProductId || productId === mainProductId
 
-  const isApprovedPurchase =
-    isMainProduct &&
+  // Order bump / upsell / downsell — each is its own standalone product,
+  // sold once, gating a single interactive page. Configured as one JSON
+  // env var (HOTMART_CONTENT_PRODUCTS: {"<hotmart product id>": "<content slug>"})
+  // instead of a code change per new offer.
+  const contentSlug = productId ? contentProductMap()[productId] : null
+
+  const isApprovedEvent =
     (eventType === 'PURCHASE_APPROVED' || eventType === 'PURCHASE_COMPLETE') &&
     (!purchaseStatus || APPROVED_STATUSES.has(purchaseStatus))
+
+  const isApprovedPurchase = isMainProduct && isApprovedEvent
 
   try {
     if (isApprovedPurchase && email && transactionId) {
@@ -50,6 +58,9 @@ export default async function handler(req, res) {
       // A renewal charge for a subscriber who'd previously been suspended
       // (lapsed payment, now paid again) gets their access back.
       if (subscriberCode) await setAccessSuspended({ source: 'hotmart', ref: subscriberCode, suspended: false })
+    } else if (contentSlug && isApprovedEvent && email && transactionId) {
+      await grantContentAccess({ email, slug: contentSlug, source: 'hotmart', externalRef: transactionId, hotmartProductId: productId })
+      await sendContentAccessEmail({ to: email, slug: contentSlug })
     } else if (isMainProduct && CANCEL_EVENTS.has(eventType) && subscriberCode) {
       await setAccessSuspended({ source: 'hotmart', ref: subscriberCode, suspended: true })
     }
