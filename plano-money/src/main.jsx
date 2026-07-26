@@ -4,6 +4,9 @@ import App from './App.jsx'
 import DominaTuDineroPage from './pages/DominaTuDineroPage.jsx'
 import BonoDiarioPage from './pages/BonoDiarioPage.jsx'
 import BonoContratoPage from './pages/BonoContratoPage.jsx'
+import ElCerebroYElDineroPage from './pages/ElCerebroYElDineroPage.jsx'
+import DelSomosDosAlSomosTresPage from './pages/DelSomosDosAlSomosTresPage.jsx'
+import BonoMapaMentalPage from './pages/BonoMapaMentalPage.jsx'
 import './index.css'
 
 // Minimal path-based routing — the main app has no router (it's a single
@@ -13,6 +16,9 @@ const ROUTES = {
   '/domina-tu-dinero': DominaTuDineroPage,
   '/bono-diario': BonoDiarioPage,
   '/bono-contrato': BonoContratoPage,
+  '/el-cerebro-y-el-dinero': ElCerebroYElDineroPage,
+  '/del-somos-dos-al-somos-tres': DelSomosDosAlSomosTresPage,
+  '/bono-mapa-mental': BonoMapaMentalPage,
 }
 
 const RootComponent = ROUTES[window.location.pathname] || App

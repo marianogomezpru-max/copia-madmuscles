@@ -15,4 +15,16 @@ export const CONTENT_REGISTRY = {
     title: 'Mi Nueva Relación con El Dinero',
     path: '/bono-contrato',
   },
+  'el-cerebro-y-el-dinero': {
+    title: 'El Cerebro y el Dinero',
+    path: '/el-cerebro-y-el-dinero',
+  },
+  'del-somos-dos-al-somos-tres': {
+    title: 'Del "Somos Dos" al "Somos Tres"',
+    path: '/del-somos-dos-al-somos-tres',
+  },
+  'bono-mapa-mental': {
+    title: 'Mapa Mental del Dinero',
+    path: '/bono-mapa-mental',
+  },
 }
