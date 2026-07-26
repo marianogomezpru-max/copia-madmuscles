@@ -19,6 +19,7 @@ import GoalsView from './components/GoalsView.jsx'
 import SavingsInvestmentsView from './components/SavingsInvestmentsView.jsx'
 import VacationControlView from './components/VacationControlView.jsx'
 import Footer from './components/Footer.jsx'
+import RecursosView from './components/resources/RecursosView.jsx'
 
 const CATEGORY_GROUP = Object.fromEntries(CATEGORIES.map(c => [c.id, c.group]))
 
@@ -644,6 +645,8 @@ export default function App() {
             )}
           </div>
         )}
+
+        {activeTab === 'recursos' && <RecursosView />}
 
         <BottomNav t={t} activeTab={activeTab} setActiveTab={setActiveTab} isAdmin={isAdmin} />
         <Footer t={t} lang={db.language} />
