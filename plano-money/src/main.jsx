@@ -11,6 +11,7 @@ import BonoQuizCompradorPage from './pages/BonoQuizCompradorPage.jsx'
 import BonoReto21DiasPage from './pages/BonoReto21DiasPage.jsx'
 import BonoChecklistCompraPage from './pages/BonoChecklistCompraPage.jsx'
 import QuizPlanoMoneyPage from './pages/QuizPlanoMoneyPage.jsx'
+import UpsellDominaTuDineroPage from './pages/UpsellDominaTuDineroPage.jsx'
 import './index.css'
 
 // Minimal path-based routing — the main app has no router (it's a single
@@ -27,6 +28,7 @@ const ROUTES = {
   '/bono-reto-21-dias': BonoReto21DiasPage,
   '/bono-checklist-compra': BonoChecklistCompraPage,
   '/quiz': QuizPlanoMoneyPage,
+  '/upsell-domina-tu-dinero': UpsellDominaTuDineroPage,
 }
 
 const RootComponent = ROUTES[window.location.pathname] || App
