@@ -1,24 +1,23 @@
-import { ShieldCheck, Zap, Smartphone, Users, Target, Mic, Star, Lock, Clock, Mail, BadgeCheck } from 'lucide-react'
+import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Lock, Clock, Mail, BadgeCheck } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 
 // TODO: reemplazar por el link real del checkout de Hotmart (Plano.Money).
 const CHECKOUT_URL = 'https://pay.hotmart.com/P106882'
 
-const ICON_GRADIENTS = ['from-lila-500 to-accent-600', 'from-celeste-500 to-celeste-600', 'from-brand-500 to-brand-600']
-
 const BENEFITS = [
-  { icon: Users, title: 'Controlá los gastos de toda tu familia', text: 'Perfiles compartidos — cada uno ve lo que le corresponde, en un solo lugar.' },
-  { icon: Target, title: 'Definí metas y seguí tu progreso', text: 'Viajes, compras, ahorro — visualizá cuánto llevás cada semana.' },
-  { icon: Mic, title: 'Registrá gastos en segundos', text: 'Con voz, sin tipear. Anotás un gasto mientras hacés otra cosa.' },
-  { icon: Zap, title: 'Reportes automáticos', text: 'Sabés a dónde va tu plata sin armar una planilla vos mismo.' },
-  { icon: Smartphone, title: 'Acceso inmediato', text: 'Desde el celular, la compu o la tablet — apenas confirmás la compra.' },
-  { icon: ShieldCheck, title: 'Tus datos, protegidos', text: 'Infraestructura segura, la misma que usan bancos y fintechs.' },
+  'Saber exactamente cuánto dinero entra, cuánto sale y cuánto podés gastar.',
+  'Organizar tus finanzas personales, familiares o las de tu negocio en un solo lugar.',
+  'Administrar con tranquilidad incluso cuando tus ingresos cambian.',
+  'Planificar metas de ahorro, vacaciones y proyectos con mayor claridad.',
+  'Tomar mejores decisiones financieras todos los días.',
 ]
 
+const DOT_COLORS = ['bg-lila-500', 'bg-celeste-500', 'bg-brand-500']
+
 const TESTIMONIALS = [
-  { name: 'Mariana y Diego', role: 'Padres de familia', photo: '/testimonio-pareja.png', quote: 'Dejamos de pelear por los gastos. Ahora armamos el presupuesto juntos y hasta ahorramos para nuestras vacaciones.', accent: 'bg-lila-500' },
   { name: 'Carolina M.', role: 'Madre de familia', photo: '/testimonio-carolina.png', quote: 'Antes el dinero desaparecía antes de fin de mes. Ahora sé exactamente en qué se va, y empezamos un fondo para vacaciones.', accent: 'bg-celeste-500' },
   { name: 'Federico H.', role: 'Diseñador freelance', photo: '/testimonio-federico.png', quote: 'Mis ingresos cambian cada mes, pero con Plano.Money por fin puedo planear y ahorrar con confianza.', accent: 'bg-brand-500' },
+  { name: 'Mariana y Diego', role: 'Padres de familia', photo: '/testimonio-pareja.png', quote: 'Dejamos de pelear por los gastos. Ahora armamos el presupuesto juntos y hasta ahorramos para nuestras vacaciones.', accent: 'bg-lila-500' },
 ]
 
 const INCLUDES = [
@@ -30,10 +29,17 @@ const INCLUDES = [
   'Compatible con celular, tablet y computadora',
 ]
 
+const TRUST_GRID = [
+  { icon: ShieldQuestion, title: 'Privacidad', text: 'Tu información está 100% segura', color: 'text-lila-500' },
+  { icon: LockIcon, title: 'Compra segura', text: 'Ambiente seguro y autenticado', color: 'text-celeste-500' },
+  { icon: MailIcon, title: 'Entrega por email', text: 'Acceso al producto entregado por email', color: 'text-brand-500' },
+  { icon: BadgeCheckIcon, title: 'Contenido aprobado', text: '100% revisado y aprobado', color: 'text-lila-500' },
+]
+
 const SEALS = [
-  { icon: Lock, label: 'SSL', sublabel: 'Pago 100% seguro', gradient: 'from-lila-500 to-accent-600', ribbon: 'bg-lila-400' },
+  { icon: ShieldCheck, label: '100%', sublabel: 'Compra segura', gradient: 'from-brand-500 to-brand-600', ribbon: 'bg-brand-500/70' },
+  { icon: Clock, label: '7 DÍAS', sublabel: 'Garantía total', gradient: 'from-rose-500 to-red-600', ribbon: 'bg-rose-400' },
   { icon: Zap, label: '24/7', sublabel: 'Acceso inmediato', gradient: 'from-celeste-500 to-celeste-600', ribbon: 'bg-celeste-400' },
-  { icon: ShieldCheck, label: '7 DÍAS', sublabel: 'Garantía total', gradient: 'from-brand-500 to-brand-600', ribbon: 'bg-brand-500/70' },
   { icon: Star, label: 'TOP', sublabel: 'Recomendado', gradient: 'from-amber-400 to-amber-500', ribbon: 'bg-amber-300' },
 ]
 
@@ -74,10 +80,9 @@ export default function SalesPagePlanoMoney() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-gradient-to-b from-lila-50 via-celeste-50/40 to-white pt-10 pb-10 px-4 overflow-hidden">
+      <section className="relative bg-gradient-to-b from-lila-50 via-celeste-50/40 to-white pt-10 pb-6 px-4 overflow-hidden">
         <div className="absolute -top-20 -left-24 w-72 h-72 bg-lila-400/30 rounded-full blur-3xl -z-10" />
         <div className="absolute top-10 -right-20 w-72 h-72 bg-celeste-400/30 rounded-full blur-3xl -z-10" />
-        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl -z-10" />
 
         <div className="max-w-3xl mx-auto text-center space-y-5">
           <Logo className="w-14 h-14 mx-auto" />
@@ -88,7 +93,7 @@ export default function SalesPagePlanoMoney() {
             </span>
           </h1>
           <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto">
-            Organizá tus gastos, compartilos con tu familia o llevá las cuentas de tu negocio — todo en un solo lugar, sin cálculos complicados.
+            Ya sea que administres tu hogar, compartas gastos con tu pareja, seas emprendedor o trabajes de forma independiente, vas a tener una visión clara de tu dinero — sin planillas complicadas ni cálculos difíciles.
           </p>
           <a
             href={CHECKOUT_URL}
@@ -98,23 +103,22 @@ export default function SalesPagePlanoMoney() {
           </a>
         </div>
 
-        {/* Device mockup */}
-        <div className="relative max-w-4xl mx-auto mt-10">
+        {/* Big device mockup */}
+        <div className="relative max-w-5xl mx-auto mt-8">
           <img
             src="/hero-mockup.png"
             alt="Plano.Money en laptop y celular"
-            className="w-full h-auto drop-shadow-2xl"
+            className="w-full h-auto"
           />
-        </div>
-
-        {/* Seals */}
-        <div className="max-w-2xl mx-auto mt-6 flex items-start justify-center gap-4 sm:gap-8 overflow-x-auto px-2">
-          {SEALS.map(s => <Seal key={s.label} {...s} />)}
         </div>
       </section>
 
-      {/* Video hero */}
-      <section className="max-w-2xl mx-auto px-4 py-14">
+      {/* Video, moved right up top per feedback: it's the strongest asset */}
+      <section className="max-w-2xl mx-auto px-4 pt-4 pb-14 text-center">
+        <h2 className="text-2xl sm:text-3xl font-black text-navy-900">Estás a un paso de transformar tus finanzas</h2>
+        <p className="text-slate-500 text-sm sm:text-base max-w-lg mx-auto mt-2 mb-6">
+          Descubrí en menos de 2 minutos cómo Plano.Money te ayuda a organizar ingresos, controlar gastos y alcanzar tus metas.
+        </p>
         <div className="rounded-3xl overflow-hidden shadow-2xl shadow-accent-600/20 border-4 border-white ring-1 ring-slate-200 bg-navy-900">
           <video
             src="/demo-plano-money.mp4"
@@ -125,21 +129,17 @@ export default function SalesPagePlanoMoney() {
             className="w-full max-h-[80vh] mx-auto block"
           />
         </div>
-        <p className="text-center text-xs text-slate-400 mt-3">Así es Plano.Money en la vida real — sin actuación, así lo usás vos.</p>
       </section>
 
-      {/* Benefits */}
+      {/* Benefits — outcome checklist */}
       <section className="bg-gradient-to-br from-celeste-50 via-white to-lila-50 py-14 px-4">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-2xl mx-auto space-y-8">
           <h2 className="text-2xl sm:text-3xl font-black text-navy-900 text-center">¿Qué vas a lograr con Plano.Money?</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {BENEFITS.map(({ icon: Icon, title, text }, i) => (
-              <div key={title} className="p-5 rounded-2xl border border-slate-200 bg-white space-y-2 shadow-sm">
-                <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${ICON_GRADIENTS[i % ICON_GRADIENTS.length]} flex items-center justify-center`}>
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-                <p className="font-bold text-navy-900 text-sm">{title}</p>
-                <p className="text-xs text-slate-500">{text}</p>
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
+            {BENEFITS.map((b, i) => (
+              <div key={b} className="flex items-start gap-3">
+                <span className={`w-2.5 h-2.5 rounded-full mt-2 shrink-0 ${DOT_COLORS[i % DOT_COLORS.length]}`} />
+                <p className="text-sm sm:text-base text-slate-700">{b}</p>
               </div>
             ))}
           </div>
@@ -188,6 +188,23 @@ export default function SalesPagePlanoMoney() {
         </div>
       </section>
 
+      {/* Trust grid */}
+      <section className="py-14 px-4 bg-white">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {TRUST_GRID.map(({ icon: Icon, title, text, color }) => (
+              <div key={title} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-start gap-3">
+                <Icon className={`w-6 h-6 shrink-0 ${color}`} />
+                <div>
+                  <p className="font-bold text-navy-900 text-sm">{title}</p>
+                  <p className="text-xs text-slate-500">{text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Guarantee + CTA */}
       <section className="py-14 px-4 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] bg-gradient-to-br from-lila-300/20 via-accent-400/20 to-celeste-300/20 rounded-full blur-3xl -z-10" />
@@ -212,11 +229,17 @@ export default function SalesPagePlanoMoney() {
             >
               Empezar ahora →
             </a>
+            <p className="relative text-white/50 text-[11px]">🎁 En el siguiente paso vas a poder sumar contenido extra con descuento especial.</p>
             <div className="relative flex items-center justify-center gap-4 text-white/50 text-[11px] pt-1">
               <span className="flex items-center gap-1"><Lock className="w-3.5 h-3.5" /> Pago seguro</span>
               <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Acceso inmediato</span>
               <span className="flex items-center gap-1"><Mail className="w-3.5 h-3.5" /> Soporte por mail</span>
             </div>
+          </div>
+
+          {/* Seals */}
+          <div className="flex items-start justify-center gap-4 sm:gap-8 overflow-x-auto px-2 pt-2">
+            {SEALS.map(s => <Seal key={s.label} {...s} />)}
           </div>
         </div>
       </section>
