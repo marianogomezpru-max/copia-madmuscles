@@ -1,13 +1,13 @@
 // Content-only data file for the Plano.Money lead quiz — the QuizEngine
 // component is fully generic; a future quiz for another product/niche is
 // just a new file like this one, no engine changes needed.
-
-// TODO: reemplazar por el link real del checkout de Hotmart (Plano.Money).
-const CHECKOUT_URL = 'https://pay.hotmart.com/P106882'
+//
+// The quiz is the sales page: all traffic starts here. Its final step
+// hands off to /oferta (SalesPagePlanoMoney) — the richer offer-reveal
+// page — which is the one that links out to the real Hotmart checkout.
 
 export const PLANO_MONEY_QUIZ = {
   quizId: 'plano-money',
-  checkoutUrl: CHECKOUT_URL,
 
   landing: {
     kicker: 'Diagnóstico Financiero Gratuito',
@@ -206,7 +206,7 @@ export const PLANO_MONEY_QUIZ = {
       originalPrice: 'US$ 5.99/mes',
       price: '50% OFF con tu código',
       cta: 'Empezar ahora →',
-      checkoutUrl: CHECKOUT_URL,
+      checkoutUrl: '/oferta',
       faq: [
         { q: '¿Cuándo se aplica mi descuento?', a: 'Se aplica automáticamente al hacer clic en "Empezar ahora" — no necesitás ingresar ningún código.' },
         { q: '¿Puedo cancelar cuando quiera?', a: 'Sí, sin permanencia mínima. Cancelás desde tu cuenta cuando quieras.' },
