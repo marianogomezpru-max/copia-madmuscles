@@ -187,7 +187,7 @@ export const PLANO_MONEY_QUIZ = {
     {
       type: 'scratch',
       title: 'Rascá y descubrí tu descuento',
-      discountLabel: '72%',
+      discountLabel: '54%',
       cta: 'Continuar →',
     },
     {
@@ -203,8 +203,8 @@ export const PLANO_MONEY_QUIZ = {
         'Incluye 3 bonos interactivos sin costo adicional.',
       ],
       guarantee: '7 días de garantía. Si Plano.Money no te ayuda a ordenar tus finanzas, te devolvemos tu dinero.',
-      originalPrice: 'US$ 17.99/mes',
-      price: 'US$ 4.99/mes',
+      originalPrice: 'US$ 12.99/mes',
+      price: 'US$ 5.99/mes',
       cta: 'Empezar ahora →',
       checkoutUrl: '/oferta',
       faq: [

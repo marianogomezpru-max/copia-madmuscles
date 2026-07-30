@@ -71,12 +71,12 @@ export default function SalesPagePlanoMoney() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Trust bar */}
-      <div className="bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 text-white text-center py-2 px-4 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
-        <span className="flex items-center gap-1"><Lock className="w-3.5 h-3.5" /> Compra 100% segura</span>
+      <div className="bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 text-white text-center py-3.5 px-4 text-sm sm:text-base font-bold flex items-center justify-center gap-2 sm:gap-5 flex-wrap">
+        <span className="flex items-center gap-1.5">🔒 Compra 100% segura</span>
         <span className="text-white/30">·</span>
-        <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Acceso inmediato</span>
+        <span className="flex items-center gap-1.5">⚡ Acceso inmediato</span>
         <span className="text-white/30">·</span>
-        <span>Comenzá hoy mismo</span>
+        <span className="flex items-center gap-1.5">🚀 Comenzá hoy mismo</span>
       </div>
 
       {/* Hero */}
@@ -220,8 +220,9 @@ export default function SalesPagePlanoMoney() {
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-lila-500/30 rounded-full blur-2xl" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-celeste-500/30 rounded-full blur-2xl" />
             <p className="relative text-white/70 text-xs font-bold uppercase">Empezá hoy</p>
-            <p className="relative text-base font-semibold text-white/40 line-through">US$ 17.99/mes</p>
-            <p className="relative text-3xl sm:text-4xl font-black text-white">US$ 4.99<span className="text-lg font-semibold text-white/60">/mes</span></p>
+            <p className="relative text-base font-semibold text-white/40 line-through">US$ 12.99/mes</p>
+            <p className="relative text-3xl sm:text-4xl font-black text-white">US$ 5.99<span className="text-lg font-semibold text-white/60">/mes</span></p>
+            <p className="relative text-white/40 text-xs line-through">US$ 155.99/año</p>
             <p className="relative text-white/60 text-xs">o US$ 35.99/año (equivale a menos de US$ 3/mes)</p>
             <a
               href={CHECKOUT_URL}
