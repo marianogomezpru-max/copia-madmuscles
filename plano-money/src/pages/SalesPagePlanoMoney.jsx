@@ -203,7 +203,8 @@ export default function SalesPagePlanoMoney() {
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-lila-500/30 rounded-full blur-2xl" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-celeste-500/30 rounded-full blur-2xl" />
             <p className="relative text-white/70 text-xs font-bold uppercase">Empezá hoy</p>
-            <p className="relative text-3xl sm:text-4xl font-black text-white">US$ 5.99<span className="text-lg font-semibold text-white/60">/mes</span></p>
+            <p className="relative text-base font-semibold text-white/40 line-through">US$ 17.99/mes</p>
+            <p className="relative text-3xl sm:text-4xl font-black text-white">US$ 4.99<span className="text-lg font-semibold text-white/60">/mes</span></p>
             <p className="relative text-white/60 text-xs">o US$ 35.99/año (equivale a menos de US$ 3/mes)</p>
             <a
               href={CHECKOUT_URL}
