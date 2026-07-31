@@ -297,20 +297,25 @@ export default function SalesPagePlanoMoney() {
             </p>
           </div>
 
-          <div className="relative bg-navy-900 rounded-2xl p-7 sm:p-8 text-center space-y-4 overflow-hidden">
+          <div className="relative bg-navy-900 rounded-2xl p-6 sm:p-7 text-center space-y-4 overflow-hidden">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-lila-500/30 rounded-full blur-2xl" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-celeste-500/30 rounded-full blur-2xl" />
             <p className="relative text-white/70 text-base font-bold uppercase">Empezá hoy</p>
 
-            <span className="relative inline-block bg-celeste-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">Mensual</span>
-            <p className="relative text-xl font-semibold text-white/40 line-through">US$ 12.99/mes</p>
-            <p className="relative text-5xl sm:text-6xl font-black text-white">US$ 5.99<span className="text-2xl font-semibold text-white/60">/mes</span></p>
+            <div className="relative grid grid-cols-2 gap-3">
+              <a href={CHECKOUT_URL} className="block bg-white/5 hover:bg-white/10 border border-celeste-400/40 rounded-xl p-4 transition">
+                <span className="inline-block bg-celeste-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">Mensual</span>
+                <p className="mt-2 text-2xl font-bold text-white/50 line-through">US$ 12.99</p>
+                <p className="text-3xl sm:text-4xl font-black text-white">US$ 5.99<span className="text-base font-semibold text-white/60">/mes</span></p>
+              </a>
+              <a href={CHECKOUT_URL_ANNUAL} className="block bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/40 rounded-xl p-4 transition">
+                <span className="inline-block bg-emerald-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">Anual</span>
+                <p className="mt-2 text-2xl font-bold text-white/50 line-through">US$ 155.99</p>
+                <p className="text-3xl sm:text-4xl font-black text-white">US$ 35.99<span className="text-base font-semibold text-white/60">/año</span></p>
+                <p className="mt-1 text-emerald-300 text-xs font-black uppercase">Ahorra 6 meses</p>
+              </a>
+            </div>
 
-            <span className="relative inline-block bg-brand-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full mt-2">Anual</span>
-            <p className="relative text-white/40 text-base line-through">US$ 155.99/año</p>
-            <a href={CHECKOUT_URL_ANNUAL} className="relative block text-celeste-300 hover:text-celeste-200 text-base underline underline-offset-2">
-              o US$ 35.99/año (equivale a menos de US$ 3/mes) →
-            </a>
             <a
               href={CHECKOUT_URL}
               className="relative block w-full bg-gradient-to-r from-lila-400 via-white to-celeste-300 text-navy-900 font-bold py-4 rounded-xl text-xl hover:brightness-105 transition"
