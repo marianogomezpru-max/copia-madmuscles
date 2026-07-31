@@ -15,7 +15,7 @@ const BENEFITS = [
 const TESTIMONIALS = [
   { name: 'Carolina M.', role: 'Madre de familia', photo: '/testimonio-carolina.png', quote: 'Por primera vez sé exactamente cuánto puedo gastar sin preocuparme.', accent: 'bg-celeste-500' },
   { name: 'Federico H.', role: 'Diseñador freelance', photo: '/testimonio-federico.png', quote: 'Por fin puedo ahorrar, aunque mis ingresos cambien cada mes.', accent: 'bg-brand-500' },
-  { name: 'Mariana y Diego', role: 'Padres de familia', photo: '/testimonio-pareja.png', quote: 'Dejamos de discutir por la plata — ahora decidimos juntos.', accent: 'bg-lila-500' },
+  { name: 'Mariana y Diego', role: 'Padres de familia', photo: '/testimonio-pareja.png', quote: 'Dejamos de discutir por la plata. Ahora decidimos juntos.', accent: 'bg-lila-500' },
 ]
 
 const INCLUDES = [
@@ -29,9 +29,9 @@ const INCLUDES = [
 ]
 
 const BONUSES = [
-  { icon: '🛍️', title: '¿Qué Comprador Eres?', text: 'Bono interactivo' },
-  { icon: '🧠', title: '21 Días para Reprogramar tu Cerebro Financiero', text: 'Bono interactivo' },
-  { icon: '🎯', title: 'Piensa Antes de Comprar', text: 'Bono interactivo' },
+  { icon: '🛍️', title: '¿Qué Comprador Eres?' },
+  { icon: '🧠', title: '21 Días para Reprogramar tu Cerebro Financiero' },
+  { icon: '🎯', title: 'Piensa Antes de Comprar' },
 ]
 
 const TRUST_GRID = [
@@ -122,7 +122,7 @@ export default function SalesPagePlanoMoney() {
         <div className="absolute top-10 -right-20 w-72 h-72 bg-celeste-400/30 rounded-full blur-3xl -z-10" />
 
         <div className="max-w-3xl mx-auto text-center space-y-5">
-          <Logo className="w-14 h-14 mx-auto" />
+          <Logo className="w-24 h-24 sm:w-28 sm:h-28 mx-auto" />
           <h1 className="text-5xl sm:text-7xl font-black text-navy-900 leading-tight">
             Dejá de preguntarte<br className="hidden sm:block" />{' '}
             a dónde se fue tu sueldo,{' '}
@@ -131,7 +131,7 @@ export default function SalesPagePlanoMoney() {
             </span>
           </h1>
           <p className="text-slate-500 text-xl sm:text-2xl max-w-xl mx-auto">
-            Ya sea que administres tu hogar, compartas gastos con tu pareja, seas emprendedor o trabajes de forma independiente, vas a tener una visión clara de tu dinero — sin planillas complicadas ni cálculos difíciles.
+            Ya sea que administres tu hogar, compartas gastos con tu pareja, seas emprendedor o trabajes de forma independiente, vas a tener una visión clara de tu dinero, sin planillas complicadas ni cálculos difíciles.
           </p>
           <a
             href={CHECKOUT_URL}
@@ -152,7 +152,7 @@ export default function SalesPagePlanoMoney() {
       </section>
 
       {/* Video, moved right up top per feedback: it's the strongest asset */}
-      <section className="max-w-2xl mx-auto px-4 pt-4 pb-14 text-center">
+      <section className="max-w-2xl mx-auto px-4 pt-4 pb-8 text-center">
         <h2 className="text-4xl sm:text-5xl font-black text-navy-900">Estás a un paso de transformar tus finanzas</h2>
         <p className="text-slate-500 text-lg sm:text-xl max-w-lg mx-auto mt-2 mb-6">
           Descubrí en menos de 2 minutos cómo Plano.Money te ayuda a organizar ingresos, controlar gastos y alcanzar tus metas.
@@ -160,8 +160,8 @@ export default function SalesPagePlanoMoney() {
         <DemoVideo />
       </section>
 
-      {/* Benefits — outcome checklist */}
-      <section className="bg-gradient-to-br from-celeste-50 via-white to-lila-50 py-14 px-4">
+      {/* Benefits: outcome checklist */}
+      <section className="bg-gradient-to-br from-celeste-50 via-white to-lila-50 py-8 px-4">
         <div className="max-w-2xl mx-auto space-y-8">
           <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">¿Qué vas a lograr con Plano.Money?</h2>
           <div className="grid grid-cols-2 gap-4">
@@ -176,7 +176,7 @@ export default function SalesPagePlanoMoney() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-14 px-4 bg-white">
+      <section className="py-8 px-4 bg-white">
         <div className="max-w-4xl mx-auto space-y-8">
           <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">Gente real, resultados reales</h2>
           <div className="grid sm:grid-cols-3 gap-4">
@@ -203,7 +203,7 @@ export default function SalesPagePlanoMoney() {
       </section>
 
       {/* What's included */}
-      <section className="bg-gradient-to-br from-brand-50 via-white to-celeste-50 py-14 px-4">
+      <section className="bg-gradient-to-br from-brand-50 via-white to-celeste-50 py-8 px-4">
         <div className="max-w-xl mx-auto space-y-6">
           <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">Todo lo que obtenés</h2>
           <div className="space-y-2.5">
@@ -215,13 +215,12 @@ export default function SalesPagePlanoMoney() {
             ))}
           </div>
 
-          <p className="text-center font-bold text-navy-900 text-lg pt-2">+ de regalo, 3 bonos interactivos</p>
-          <div className="grid sm:grid-cols-3 gap-3">
+          <p className="text-center font-black text-navy-900 text-2xl sm:text-3xl pt-4">Incluye 3 Bonos Interactivos que te ayudarán en tu proceso</p>
+          <div className="grid sm:grid-cols-3 gap-4">
             {BONUSES.map(b => (
-              <div key={b.title} className="bg-white border border-slate-200 rounded-xl p-4 text-center space-y-1 shadow-sm">
-                <p className="text-3xl">{b.icon}</p>
-                <p className="font-bold text-navy-900 text-sm leading-tight">{b.title}</p>
-                <p className="text-xs text-slate-400">{b.text}</p>
+              <div key={b.title} className="bg-navy-900 rounded-2xl p-6 text-center space-y-2 shadow-md">
+                <p className="text-5xl">{b.icon}</p>
+                <p className="font-bold text-white text-lg leading-tight">{b.title}</p>
               </div>
             ))}
           </div>
@@ -229,7 +228,7 @@ export default function SalesPagePlanoMoney() {
       </section>
 
       {/* Trust grid */}
-      <section className="py-14 px-4 bg-white">
+      <section className="py-8 px-4 bg-white">
         <div className="max-w-2xl mx-auto space-y-6">
           <div className="grid sm:grid-cols-2 gap-4">
             {TRUST_GRID.map(({ icon: Icon, title, text, color }) => (
@@ -246,7 +245,7 @@ export default function SalesPagePlanoMoney() {
       </section>
 
       {/* Guarantee + CTA */}
-      <section className="py-14 px-4 relative overflow-hidden">
+      <section className="py-8 px-4 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] bg-gradient-to-br from-lila-300/20 via-accent-400/20 to-celeste-300/20 rounded-full blur-3xl -z-10" />
         <div className="max-w-xl mx-auto space-y-6">
           <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
@@ -287,9 +286,9 @@ export default function SalesPagePlanoMoney() {
 
       <footer className="max-w-2xl mx-auto px-4 pb-10 text-center space-y-2">
         <p className="text-base text-slate-400 leading-relaxed">
-          Plano.Money es una herramienta de organización financiera personal. No constituye asesoría financiera profesional ni garantiza resultados de ahorro específicos — estos dependen de las decisiones y hábitos de cada usuario.
+          Plano.Money es una herramienta de organización financiera personal. No constituye asesoría financiera profesional ni garantiza resultados de ahorro específicos. Estos dependen de las decisiones y hábitos de cada usuario.
         </p>
-        <p className="text-base text-slate-300">© {new Date().getFullYear()} Novi Global International S.A. · Plano.Money — Todos los derechos reservados.</p>
+        <p className="text-base text-slate-300">© {new Date().getFullYear()} Novi Global International S.A. · Plano.Money. Todos los derechos reservados.</p>
       </footer>
     </div>
   )
