@@ -12,7 +12,6 @@ function stepVisible(step, answers) {
 }
 
 const ACCENTS = ['border-lila-500 bg-lila-50', 'border-celeste-500 bg-celeste-50', 'border-brand-500 bg-brand-50']
-const ACCENT_DOTS = ['bg-lila-500', 'bg-celeste-500', 'bg-brand-500']
 
 function ProgressHeader({ title, pct, onBack, showBack }) {
   return (
@@ -99,6 +98,11 @@ export default function QuizEngine({ data }) {
   }, [stepIndex])
 
   const name = answers.name || ''
+  // La gente a veces pone nombre y apellido acá — usamos solo el primer
+  // nombre para que se sienta cercano, no como un formulario.
+  const firstName = name.trim().split(/\s+/)[0] || ''
+  const deseoLabel = data.deseoLabels?.[answers.deseo] || 'lograr lo que te propongas'
+  const fill = str => str.replace('{{name}}', firstName).replace('{{deseo}}', deseoLabel)
   const profile = data.computeProfile(answers)
   const offerUrl = `/oferta?p=${profile.key}`
 
@@ -178,7 +182,7 @@ export default function QuizEngine({ data }) {
 
           {step.type === 'question' && (
             <>
-              <h2 className="text-2xl font-black text-navy-900">{step.question.replace('{{name}}', name)}</h2>
+              <h2 className="text-2xl font-black text-navy-900">{fill(step.question)}</h2>
               {step.subtitle && <p className="text-base text-slate-500">{step.subtitle}</p>}
               {step.inputType === 'slider' ? (
                 <div className="pt-2">
@@ -247,18 +251,6 @@ export default function QuizEngine({ data }) {
             </>
           )}
 
-          {step.type === 'pitch' && (
-            <>
-              <h2 className="text-2xl font-black text-navy-900">{step.title}</h2>
-              <p className="text-base text-slate-600">{step.body}</p>
-              {step.image && (
-                <div className="rounded-2xl overflow-hidden border-4 border-white ring-1 ring-slate-200 shadow-lg">
-                  <img src={step.image} alt={step.imageAlt || ''} className="w-full h-48 sm:h-56 object-cover object-top" />
-                </div>
-              )}
-            </>
-          )}
-
           {step.type === 'trivia' && (
             <>
               <h2 className="text-xl font-black text-navy-900">{step.question}</h2>
@@ -284,7 +276,7 @@ export default function QuizEngine({ data }) {
           {step.type === 'alert' && (
             <>
               <span className="inline-block text-xs font-bold uppercase bg-red-100 text-red-600 px-3 py-1.5 rounded-full">Zona de alerta</span>
-              <h2 className="text-xl font-black text-navy-900">{step.title.replace('{{name}}', name)}</h2>
+              <h2 className="text-xl font-black text-navy-900">{fill(step.title)}</h2>
               <div className="space-y-2.5">
                 {step.items.map((it, i) => (
                   <p key={i} className="text-sm text-slate-700 flex gap-2"><span className="text-red-500 font-bold shrink-0">✗</span>{it}</p>
@@ -300,22 +292,22 @@ export default function QuizEngine({ data }) {
           {step.type === 'loading' && (
             <div className="text-center py-8 space-y-5">
               <div className="w-20 h-20 mx-auto border-[6px] border-lila-100 border-t-lila-500 rounded-full animate-spin" />
-              <p className="font-bold text-navy-900 text-lg">{step.message}</p>
+              <p className="font-bold text-navy-900 text-lg">{fill(step.message)}</p>
               {step.trust && <p className="text-sm text-slate-400">{step.trust}</p>}
             </div>
           )}
 
           {step.type === 'gauge' && (
             <>
-              <h2 className="text-xl font-black text-navy-900 text-center">{step.title.replace('{{name}}', name)}</h2>
+              <h2 className="text-xl font-black text-navy-900 text-center">{fill(step.title)}</h2>
               <GaugeMeter score={data.computeScore(answers)} label={step.subtitle} />
             </>
           )}
 
           {step.type === 'projection' && (
             <>
-              <h2 className="text-xl font-black text-navy-900">{step.title}</h2>
-              <p className="text-base text-slate-500">{step.subtitle}</p>
+              <h2 className="text-xl font-black text-navy-900">{fill(step.title)}</h2>
+              <p className="text-base text-slate-500">{fill(step.subtitle)}</p>
               <div className="bg-slate-50 rounded-2xl p-4">
                 <svg viewBox="0 0 200 80" className="w-full">
                   <polyline points="0,60 30,65 60,58 90,68" fill="none" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" />
@@ -332,9 +324,19 @@ export default function QuizEngine({ data }) {
           {step.type === 'result' && (
             <div className="text-center space-y-4">
               <span className="inline-block text-xs font-bold uppercase bg-brand-100 text-brand-700 px-3 py-1.5 rounded-full">Diagnóstico personalizado</span>
-              <h2 className="text-2xl font-black text-navy-900">{name ? `${name}, tu perfil es:` : 'Tu perfil es:'}</h2>
+              <h2 className="text-2xl font-black text-navy-900">{firstName ? `${firstName}, tu perfil es:` : 'Tu perfil es:'}</h2>
               <p className="text-xl font-black bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 bg-clip-text text-transparent">{profile.title}</p>
               <p className="text-base text-slate-600">{profile.description}</p>
+              {answers.deseo && (
+                <p className="text-base text-slate-600">
+                  Y en el fondo, lo que más querés es {deseoLabel}. Se puede: es cuestión de sistema, no de esfuerzo.
+                </p>
+              )}
+              {profile.image && (
+                <div className="rounded-2xl overflow-hidden border-4 border-white ring-1 ring-slate-200 shadow-lg">
+                  <img src={profile.image} alt={profile.imageAlt || ''} className="w-full h-44 sm:h-52 object-cover object-top" />
+                </div>
+              )}
             </div>
           )}
         </div>

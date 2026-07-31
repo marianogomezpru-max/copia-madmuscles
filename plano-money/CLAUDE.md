@@ -52,12 +52,25 @@ scratch:
   commercial content (price, bonuses, guarantee, order bump) lives
   exclusively on the offer page and Hotmart's checkout. If a future quiz
   edit is tempted to add a price or a bonus mention, it belongs on the
-  offer page instead. The `pitch` steps (contextual mini-screens shown
-  mid-quiz, one per diagnosed problem) use real cropped screenshots of
-  the actual app (`public/quiz-pitch-*.png`), never a placeholder box or
-  a stock/AI photo of a person — same rule as everywhere else in this
-  project: no fabricated "social proof" or imagery standing in for
-  something real.
+  offer page instead.
+- **No mid-quiz "here's our product" pitch screens**: an earlier version
+  had a `pitch` step type (one variant per diagnosed problem, shown right
+  after the person answered `area_afectada`) that broke the diagnostic
+  frame and started to feel like a sales interruption — cut entirely.
+  The one real screenshot of the app now appears exactly once, on the
+  `result` step, alongside the diagnosis (`profile.image` /
+  `profile.imageAlt`, set per-branch in `computeProfile()`,
+  `public/quiz-result-*.png`). Never a placeholder box or a stock/AI
+  photo of a person standing in for something real — same rule as
+  everywhere else in this project.
+- **The quiz has to land emotionally, not just collect data**: it asks
+  what the person would do if money weren't a problem (`deseo` question)
+  and carries that answer through in plain language via `{{deseo}}`
+  interpolation (`data.deseoLabels` + the generic `fill()` helper in
+  `QuizEngine.jsx` — works alongside `{{name}}`, which always uses first
+  name only even if someone types a full name). The projection screen and
+  the final result screen both reference it, so the whole arc closes on
+  the person's own stated desire, not a generic pitch.
 - Two-repo sync discipline still applies: this workspace
   (`marianogomezpru-max/Plano.Money`, `main`) mirrors
   `/home/user/copia-madmuscles/plano-money`
@@ -69,9 +82,14 @@ scratch:
 
 `QuizEngine.jsx` got the same design pass as `/oferta`: lila/celeste/verde
 gradient progress bar and CTAs, blurred color blobs behind the card,
-bigger type, colored accent per option card, real screenshots (not empty
-placeholder boxes) in the `pitch` steps. Keep new quiz screens consistent
-with this rather than reverting to flat navy/white/slate.
+bigger type, colored accent per option card. Keep new quiz screens
+consistent with this rather than reverting to flat navy/white/slate.
+
+`QuizEngine.jsx` stays fully generic — no Plano.Money-specific copy or
+logic in it. Everything content-specific (questions, profiles,
+`deseoLabels`, images) lives in the quiz's own data file
+(`planoMoneyQuiz.js`). A future quiz for a different app or niche is a
+new data file with the same shape; the engine doesn't change.
 
 ## Known outstanding item
 

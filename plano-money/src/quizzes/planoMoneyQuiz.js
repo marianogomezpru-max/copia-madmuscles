@@ -6,10 +6,24 @@
 // /oferta with that diagnosis attached (?p=<profile key>). No price, no
 // bonuses, no checkout copy belongs here — that's all /oferta's job, so
 // the two never say conflicting things and neither has to be updated
-// twice when a price or bonus changes.
+// twice when a price or bonus changes. It also stays a pure diagnosis
+// start to finish: no mid-quiz "here's our product" pitch screens either,
+// those broke the diagnostic frame and started to feel like a sales
+// interruption. The one real screenshot of the app shows up exactly
+// once, on the final result screen, alongside the diagnosis itself.
 
 export const PLANO_MONEY_QUIZ = {
   quizId: 'plano-money',
+
+  // Frase corta para completar "{{deseo}}" en cualquier texto del quiz
+  // (ver 'projection' más abajo) según lo que la persona eligió como su
+  // deseo — mantiene ese hilo emocional concreto hasta el final.
+  deseoLabels: {
+    viajar: 'viajar sin culpa',
+    comprar: 'darte ese gusto importante',
+    ahorrar: 'tener un colchón de ahorro',
+    tranquilidad: 'vivir sin pensar en plata todo el tiempo',
+  },
 
   landing: {
     kicker: 'Diagnóstico Financiero Gratuito',
@@ -44,6 +58,7 @@ export const PLANO_MONEY_QUIZ = {
       inputType: 'radio',
       options: [
         { value: 'empleo_fijo', label: 'Empleo fijo', sublabel: 'Sueldo mensual estable', icon: '💼' },
+        { value: 'empleo_comision', label: 'Empleo fijo + comisión', sublabel: 'Sueldo base más variable según resultados', icon: '📈' },
         { value: 'comerciante', label: 'Soy comerciante o tengo un negocio', sublabel: 'Ventas que varían mes a mes', icon: '🏪' },
         { value: 'independiente', label: 'Trabajo independiente', sublabel: 'Ingresos variables por proyecto', icon: '💻' },
       ],
@@ -73,48 +88,21 @@ export const PLANO_MONEY_QUIZ = {
       ],
     },
     {
+      type: 'question',
+      key: 'deseo',
+      question: 'Si tu situación financiera no fuera un problema, ¿qué es lo primero que harías?',
+      inputType: 'radio',
+      options: [
+        { value: 'viajar', label: 'Viajar sin culpa', sublabel: 'Ese viaje que seguís posponiendo', icon: '🌴' },
+        { value: 'comprar', label: 'Darte un gusto importante', sublabel: 'Auto, casa propia, un proyecto grande', icon: '🏠' },
+        { value: 'ahorrar', label: 'Tener un colchón de ahorro', sublabel: 'Dormir tranquilo/a ante un imprevisto', icon: '💰' },
+        { value: 'tranquilidad', label: 'Vivir sin pensar en plata todo el tiempo', icon: '😌' },
+      ],
+    },
+    {
       type: 'agreement',
       key: 'acuerdo_gasto',
       statement: 'El dinero se me va y no sé bien en qué.',
-    },
-    // Mini-pitch contextual, con una imagen real de la app — una variante
-    // por cada opción de "area_afectada", para que la persona vea la
-    // función que resuelve justo lo que acaba de contarnos.
-    {
-      type: 'pitch',
-      showIf: { key: 'area_afectada', equals: 'pareja' },
-      title: 'Plano.Money resuelve justo esto',
-      body: 'Compartís las cuentas con tu pareja o tu familia. Cada uno ve lo suyo, sin señalar con el dedo.',
-      image: '/quiz-pitch-perfiles.png',
-      imageAlt: 'Pantalla real de Plano.Money agregando un integrante a la familia',
-      cta: 'Seguir →',
-    },
-    {
-      type: 'pitch',
-      showIf: { key: 'area_afectada', equals: 'tranquilidad' },
-      title: 'Plano.Money resuelve justo esto',
-      body: 'Sabés, de un vistazo, cuánto tenés disponible hoy. Sin esa sensación de no saber si te alcanza.',
-      image: '/quiz-pitch-resumen.png',
-      imageAlt: 'Pantalla real de Plano.Money con el resumen de gastos del mes',
-      cta: 'Seguir →',
-    },
-    {
-      type: 'pitch',
-      showIf: { key: 'area_afectada', equals: 'metas' },
-      title: 'Plano.Money resuelve justo esto',
-      body: 'Definís tu meta en la app y ves cuánto llevás ahorrado cada semana. Dejás de posponerla "para cuando sobre".',
-      image: '/quiz-pitch-metas.png',
-      imageAlt: 'Pantalla real de Plano.Money creando una nueva meta de ahorro',
-      cta: 'Seguir →',
-    },
-    {
-      type: 'pitch',
-      showIf: { key: 'area_afectada', equals: 'todo' },
-      title: 'No estás solo/a',
-      body: 'Es la combinación más común. Plano.Money ataca las tres cosas a la vez: organiza tus gastos, tu ahorro y lo que compartís con tu familia, todo en un solo lugar.',
-      image: '/quiz-pitch-general.png',
-      imageAlt: 'Pantalla real del panel principal de Plano.Money',
-      cta: 'Seguir →',
     },
     {
       type: 'question',
@@ -131,7 +119,7 @@ export const PLANO_MONEY_QUIZ = {
     {
       type: 'question',
       key: 'compromiso',
-      question: '¿Estás dispuesto/a a dedicarle 5 minutos por día durante 21 días?',
+      question: '¿Estás dispuesto/a a dedicarle 3 minutos por día durante 21 días?',
       inputType: 'radio',
       options: [
         { value: 'si', label: 'Sí, 100% comprometido/a', icon: '🔥' },
@@ -153,12 +141,12 @@ export const PLANO_MONEY_QUIZ = {
         'Vivir sin un fondo de emergencia significa que cualquier imprevisto se resuelve con deuda.',
         'La ansiedad financiera es una de las principales causas de discusión de pareja.',
       ],
-      goodNews: 'La buena noticia: con un sistema simple, esto se revierte en semanas, no en años.',
+      goodNews: 'Con un sistema simple, esto se revierte en semanas, no en años.',
       cta: 'Ver mi diagnóstico →',
     },
     {
       type: 'loading',
-      message: 'Armando tu Diagnóstico Financiero...',
+      message: 'Armando tu Diagnóstico Financiero, {{name}}...',
       trust: 'Cruzando tus respuestas con el método Plano.Money',
       duration: 2200,
     },
@@ -170,8 +158,8 @@ export const PLANO_MONEY_QUIZ = {
     },
     {
       type: 'projection',
-      title: 'Así se ve el cambio',
-      subtitle: 'Cuando empezás a tener el control real de tu dinero.',
+      title: 'Así se ve tu cambio, {{name}}',
+      subtitle: 'Cuando empezás a tener el control real de tu dinero, para poder {{deseo}}.',
       cta: 'Continuar →',
     },
     {
@@ -181,8 +169,10 @@ export const PLANO_MONEY_QUIZ = {
       note: 'Asegurate de que sea válido: ahí te llega también tu diagnóstico completo.',
       cta: 'Ver mi resultado →',
     },
-    // Última pantalla del quiz: solo el diagnóstico. Ni precio ni bonos
-    // acá, eso es trabajo de /oferta a partir de este punto.
+    // Última pantalla del quiz: el diagnóstico personalizado, con una
+    // captura real de la app que respalda ese diagnóstico específico.
+    // Ni precio ni bonos acá, eso es trabajo de /oferta a partir de este
+    // punto.
     {
       type: 'result',
       cta: 'Ver mi plan personalizado →',
@@ -205,20 +195,26 @@ export const PLANO_MONEY_QUIZ = {
 
   // `key` identifies which /oferta hero variant (PROFILE_HERO in
   // SalesPagePlanoMoney.jsx) picks up the thread after the quiz — keep
-  // both in sync if a profile is added, renamed, or removed here.
+  // both in sync if a profile is added, renamed, or removed here. `image`
+  // is the real app screenshot shown alongside the diagnosis on the
+  // result step.
   computeProfile(answers) {
     if (answers.area_afectada === 'pareja') {
       return {
         key: 'pareja',
         title: 'El Equipo Desalineado',
         description: 'El dinero se volvió un tema de tensión en pareja o familia más que de números. Tu diagnóstico se enfoca en organizar las cuentas compartidas para bajar la fricción.',
+        image: '/quiz-result-pareja.png',
+        imageAlt: 'Pantalla real de Plano.Money agregando un integrante a la familia',
       }
     }
-    if (answers.situacion === 'comerciante' || answers.situacion === 'independiente') {
+    if (answers.situacion === 'comerciante' || answers.situacion === 'independiente' || answers.situacion === 'empleo_comision') {
       return {
         key: 'ingreso_variable',
         title: 'El Ingreso Variable Sin Sistema',
         description: 'Tus ingresos cambian mes a mes, y hoy los administrás "a ojo". Tu diagnóstico se enfoca en crear un colchón que te dé estabilidad incluso en los meses flojos.',
+        image: '/quiz-result-ingreso-variable.png',
+        imageAlt: 'Pantalla real de Plano.Money con el resumen de gastos del mes',
       }
     }
     if (answers.emocion === 'culpa' || answers.acuerdo_gasto >= 4) {
@@ -226,12 +222,16 @@ export const PLANO_MONEY_QUIZ = {
         key: 'comprador_emocional',
         title: 'El Comprador Emocional',
         description: 'Gran parte de tus gastos responden a una emoción del momento, no a un plan. Tu diagnóstico se enfoca en identificar esos disparadores antes de que aparezcan.',
+        image: '/quiz-result-emocional.png',
+        imageAlt: 'Pantalla real de Plano.Money alertando un gasto por encima de lo presupuestado',
       }
     }
     return {
       key: 'reactivo',
       title: 'El Reactivo Sin Sistema',
       description: 'No te falta disciplina. Te falta un sistema simple que te muestre a dónde va tu plata sin esfuerzo.',
+      image: '/quiz-result-reactivo.png',
+      imageAlt: 'Pantalla real del panel principal de Plano.Money',
     }
   },
 }
