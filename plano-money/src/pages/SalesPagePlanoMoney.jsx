@@ -35,10 +35,10 @@ const BONUSES = [
 ]
 
 const TRUST_GRID = [
-  { icon: ShieldQuestion, title: 'Privacidad', text: 'Tu información está 100% segura', color: 'text-lila-500' },
-  { icon: LockIcon, title: 'Compra segura', text: 'Ambiente seguro y autenticado', color: 'text-celeste-500' },
-  { icon: MailIcon, title: 'Entrega por email', text: 'Acceso al producto entregado por email', color: 'text-brand-500' },
-  { icon: BadgeCheckIcon, title: 'Contenido aprobado', text: '100% revisado y aprobado', color: 'text-lila-500' },
+  { icon: ShieldQuestion, title: 'Privacidad', text: 'Tu información está 100% segura' },
+  { icon: LockIcon, title: 'Compra segura', text: 'Ambiente seguro y autenticado' },
+  { icon: MailIcon, title: 'Entrega por email', text: 'Acceso al producto entregado por email' },
+  { icon: BadgeCheckIcon, title: 'Contenido aprobado', text: '100% revisado y aprobado' },
 ]
 
 const SEALS = [
@@ -142,7 +142,7 @@ export default function SalesPagePlanoMoney() {
         </div>
 
         {/* Big device mockup */}
-        <div className="relative max-w-7xl mx-auto mt-8">
+        <div className="relative max-w-5xl mx-auto mt-8">
           <img
             src="/hero-mockup.png"
             alt="Plano.Money en laptop y celular"
@@ -166,9 +166,9 @@ export default function SalesPagePlanoMoney() {
           <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">¿Qué vas a lograr con Plano.Money?</h2>
           <div className="grid grid-cols-2 gap-4">
             {BENEFITS.map(b => (
-              <div key={b.text} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center space-y-2">
+              <div key={b.text} className="bg-celeste-600 rounded-2xl shadow-sm p-6 text-center space-y-2">
                 <p className="text-4xl">{b.icon}</p>
-                <p className="text-lg sm:text-xl font-bold text-navy-900">{b.text}</p>
+                <p className="text-lg sm:text-xl font-bold text-white">{b.text}</p>
               </div>
             ))}
           </div>
@@ -231,12 +231,12 @@ export default function SalesPagePlanoMoney() {
       <section className="py-8 px-4 bg-white">
         <div className="max-w-2xl mx-auto space-y-6">
           <div className="grid sm:grid-cols-2 gap-4">
-            {TRUST_GRID.map(({ icon: Icon, title, text, color }) => (
-              <div key={title} className="bg-slate-50 border border-slate-200 rounded-2xl p-5 flex items-start gap-3">
-                <Icon className={`w-7 h-7 shrink-0 ${color}`} />
+            {TRUST_GRID.map(({ icon: Icon, title, text }) => (
+              <div key={title} className="bg-brand-600 rounded-2xl p-5 flex items-start gap-3">
+                <Icon className="w-7 h-7 shrink-0 text-white" />
                 <div>
-                  <p className="font-bold text-navy-900 text-lg">{title}</p>
-                  <p className="text-base text-slate-500">{text}</p>
+                  <p className="font-bold text-white text-lg">{title}</p>
+                  <p className="text-base text-white/70">{text}</p>
                 </div>
               </div>
             ))}
