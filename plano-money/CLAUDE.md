@@ -40,9 +40,19 @@ scratch:
 
 ## Known outstanding item
 
-`CHECKOUT_URL` in `src/pages/SalesPagePlanoMoney.jsx` and
-`src/quizzes/planoMoneyQuiz.js` is still a placeholder
-(`https://pay.hotmart.com/P106882`). Every CTA button on `/oferta`
-currently points nowhere real. Replace with the actual Hotmart checkout
-URL for the Plano.Money product as soon as it's provided, in both files,
-in both repos.
+`CHECKOUT_URL` and `CHECKOUT_URL_ANNUAL` in `src/pages/SalesPagePlanoMoney.jsx`
+are still both the same placeholder (`https://pay.hotmart.com/P106882`).
+`src/quizzes/planoMoneyQuiz.js` also still points at the placeholder.
+
+Important: Hotmart confirmed monthly and annual are two fully separate
+offers, each with its own checkout link AND its own independent Página de
+Pago Personalizada (order bump / upsell / downsell config) — Hotmart does
+not support one checkout with a plan switcher. So:
+
+1. Get both real checkout links (mensual and anual) from Hotmart's
+   Ofertas tab and drop them into `CHECKOUT_URL` /
+   `CHECKOUT_URL_ANNUAL`, in both repos.
+2. Confirm the order bump / upsell / downsell Página de Pago
+   Personalizada has been set up on **both** offers, not just the
+   monthly one — otherwise annual buyers coming through `/oferta`'s
+   annual link silently skip the order bump/upsell/downsell.

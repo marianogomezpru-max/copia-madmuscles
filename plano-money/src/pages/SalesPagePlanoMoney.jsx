@@ -2,8 +2,12 @@ import { useRef, useState } from 'react'
 import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Clock, BadgeCheck, Play } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 
-// TODO: reemplazar por el link real del checkout de Hotmart (Plano.Money).
-const CHECKOUT_URL = 'https://pay.hotmart.com/P106882'
+// TODO: reemplazar por los links reales del checkout de Hotmart (Plano.Money).
+// Son dos ofertas separadas en Hotmart (cada una con su propia Página de
+// Pago Personalizada, order bump, upsell y downsell) — no una sola con
+// selector de plan, así que necesitamos los dos links.
+const CHECKOUT_URL = 'https://pay.hotmart.com/P106882' // plan mensual (US$ 5.99/mes)
+const CHECKOUT_URL_ANNUAL = 'https://pay.hotmart.com/P106882' // plan anual (US$ 35.99/año)
 
 const BENEFITS = [
   { icon: '💰', text: 'Saber cuánto entra' },
@@ -268,7 +272,9 @@ export default function SalesPagePlanoMoney() {
             <p className="relative text-xl font-semibold text-white/40 line-through">US$ 12.99/mes</p>
             <p className="relative text-5xl sm:text-6xl font-black text-white">US$ 5.99<span className="text-2xl font-semibold text-white/60">/mes</span></p>
             <p className="relative text-white/40 text-base line-through">US$ 155.99/año</p>
-            <p className="relative text-white/60 text-base">o US$ 35.99/año (equivale a menos de US$ 3/mes)</p>
+            <a href={CHECKOUT_URL_ANNUAL} className="relative block text-celeste-300 hover:text-celeste-200 text-base underline underline-offset-2">
+              o US$ 35.99/año (equivale a menos de US$ 3/mes) →
+            </a>
             <a
               href={CHECKOUT_URL}
               className="relative block w-full bg-gradient-to-r from-lila-400 via-white to-celeste-300 text-navy-900 font-bold py-4 rounded-xl text-xl hover:brightness-105 transition"
