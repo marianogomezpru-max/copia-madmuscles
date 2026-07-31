@@ -158,6 +158,12 @@ export default function SalesPagePlanoMoney() {
           Descubrí en menos de 2 minutos cómo Plano.Money te ayuda a organizar ingresos, controlar gastos y alcanzar tus metas.
         </p>
         <DemoVideo />
+        <a
+          href={CHECKOUT_URL}
+          className="inline-block mt-6 bg-gradient-to-r from-lila-500 via-accent-600 to-celeste-500 hover:brightness-110 text-white font-bold py-4 px-9 rounded-full text-xl shadow-xl shadow-accent-600/30 transition hover:scale-105"
+        >
+          Quiero ordenar mis finanzas →
+        </a>
       </section>
 
       {/* Benefits: outcome checklist */}
