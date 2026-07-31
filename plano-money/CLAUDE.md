@@ -34,9 +34,9 @@ scratch:
 - **Quiz-to-offer personalization (standing pattern, keep doing this)**:
   the quiz computes a `profile` (`computeProfile()` in the quiz's data
   file) representing which of a handful of real, distinct problems the
-  person has. The quiz's final step appends that profile's `key` to the
-  offer URL as `?p=<key>` (see `QuizEngine.jsx`'s `salesPage` step). The
-  offer page reads that param (`getProfileHero()` in
+  person has. The quiz's `result` step (its last step) links straight to
+  `/oferta?p=<profile.key>` — computed inline in `QuizEngine.jsx`, not
+  stored as data. The offer page reads that param (`getProfileHero()` in
   `SalesPagePlanoMoney.jsx`) and swaps just the hero headline + subtitle
   to speak directly to that problem, with copy/psychology matched to it,
   defaulting to a generic variant when there's no param (cold traffic
@@ -45,6 +45,19 @@ scratch:
   else (mockup, video, benefits, testimonials, pricing) stays shared so
   edits never need to be repeated per-variant. Apply this same pattern to
   any future quiz+offer pair.
+- **The quiz only diagnoses, it never sells**: no price, no discount, no
+  bonus, no guarantee copy anywhere in `planoMoneyQuiz.js` or
+  `QuizEngine.jsx`. Its last step is the personalized diagnosis
+  (`result`), whose only CTA is the handoff link to `/oferta`. All
+  commercial content (price, bonuses, guarantee, order bump) lives
+  exclusively on the offer page and Hotmart's checkout. If a future quiz
+  edit is tempted to add a price or a bonus mention, it belongs on the
+  offer page instead. The `pitch` steps (contextual mini-screens shown
+  mid-quiz, one per diagnosed problem) use real cropped screenshots of
+  the actual app (`public/quiz-pitch-*.png`), never a placeholder box or
+  a stock/AI photo of a person — same rule as everywhere else in this
+  project: no fabricated "social proof" or imagery standing in for
+  something real.
 - Two-repo sync discipline still applies: this workspace
   (`marianogomezpru-max/Plano.Money`, `main`) mirrors
   `/home/user/copia-madmuscles/plano-money`
@@ -52,11 +65,18 @@ scratch:
   `claude/plano-money-app-review-v7ck4g`) — copy, build both, commit with
   matching messages, push both.
 
+## `/quiz` visual language matches `/oferta`
+
+`QuizEngine.jsx` got the same design pass as `/oferta`: lila/celeste/verde
+gradient progress bar and CTAs, blurred color blobs behind the card,
+bigger type, colored accent per option card, real screenshots (not empty
+placeholder boxes) in the `pitch` steps. Keep new quiz screens consistent
+with this rather than reverting to flat navy/white/slate.
+
 ## Known outstanding item
 
 `CHECKOUT_URL` and `CHECKOUT_URL_ANNUAL` in `src/pages/SalesPagePlanoMoney.jsx`
 are still both the same placeholder (`https://pay.hotmart.com/P106882`).
-`src/quizzes/planoMoneyQuiz.js` also still points at the placeholder.
 
 Important: Hotmart confirmed monthly and annual are two fully separate
 offers, each with its own checkout link AND its own independent Página de
