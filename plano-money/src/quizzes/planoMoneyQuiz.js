@@ -179,18 +179,21 @@ export const PLANO_MONEY_QUIZ = {
     },
   ],
 
-  // Heurística simple 0-100: arranca en 55 y suma/resta según respuestas.
+  // Heurística simple 0-100: arranca en 35 (justo entrando en zona
+  // amarilla) y suma/resta según respuestas. El techo se limita a 60 a
+  // propósito: nadie debería ver "Zona Verde" en el diagnóstico, esa zona
+  // es la promesa de después de usar el sistema, no el punto de partida.
   computeScore(answers) {
-    let score = 55
-    const bump = { ansioso: -15, frustrado: -10, culpa: -12, esperanzado: 5 }
+    let score = 35
+    const bump = { ansioso: -12, frustrado: -8, culpa: -10, esperanzado: 10 }
     score += bump[answers.emocion] || 0
-    if (answers.acuerdo_gasto >= 4) score -= 12
-    if (answers.acuerdo_gasto <= 2) score += 8
+    if (answers.acuerdo_gasto >= 4) score -= 10
+    if (answers.acuerdo_gasto <= 2) score += 10
     if (answers.intentos_previos === 'nunca') score -= 5
-    if (answers.compromiso === 'si') score += 10
-    if (answers.compromiso === 'dudas') score -= 5
-    if (answers.area_afectada === 'todo') score -= 8
-    return Math.max(5, Math.min(95, Math.round(score)))
+    if (answers.compromiso === 'si') score += 8
+    if (answers.compromiso === 'dudas') score -= 8
+    if (answers.area_afectada === 'todo') score -= 6
+    return Math.max(5, Math.min(60, Math.round(score)))
   },
 
   // `key` identifies which /oferta hero variant (PROFILE_HERO in

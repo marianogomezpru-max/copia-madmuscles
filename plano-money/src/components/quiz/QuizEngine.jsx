@@ -309,7 +309,15 @@ export default function QuizEngine({ data }) {
               <h2 className="text-xl font-black text-navy-900">{fill(step.title)}</h2>
               <p className="text-base text-slate-500">{fill(step.subtitle)}</p>
               <div className="bg-slate-50 rounded-2xl p-4">
-                <svg viewBox="0 0 200 80" className="w-full">
+                <svg viewBox="0 0 200 90" className="w-full">
+                  <defs>
+                    <pattern id="projectionGrid" width="20" height="16" patternUnits="userSpaceOnUse">
+                      <path d="M 20 0 L 0 0 0 16" fill="none" stroke="#e2e8f0" strokeWidth="1" />
+                    </pattern>
+                  </defs>
+                  <rect x="0" y="0" width="200" height="80" fill="url(#projectionGrid)" />
+                  <line x1="0" y1="0" x2="0" y2="80" stroke="#94a3b8" strokeWidth="1.5" />
+                  <line x1="0" y1="80" x2="200" y2="80" stroke="#94a3b8" strokeWidth="1.5" />
                   <polyline points="0,60 30,65 60,58 90,68" fill="none" stroke="#ef4444" strokeWidth="4" strokeLinecap="round" />
                   <polyline points="90,68 120,45 150,25 200,10" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" />
                 </svg>

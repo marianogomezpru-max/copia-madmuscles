@@ -297,10 +297,10 @@ export default function SalesPagePlanoMoney() {
             </p>
           </div>
 
-          <div className="relative bg-navy-900 rounded-2xl p-6 sm:p-7 text-center space-y-4 overflow-hidden">
+          <div className="relative bg-navy-900 rounded-2xl p-6 sm:p-7 pt-4 text-center space-y-4 overflow-hidden">
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-lila-500/30 rounded-full blur-2xl" />
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-celeste-500/30 rounded-full blur-2xl" />
-            <p className="relative text-white/70 text-base font-bold uppercase">Empezá hoy</p>
+            <p className="relative text-white text-xl font-black uppercase">Empezá hoy</p>
 
             <div className="relative grid grid-cols-2 gap-3">
               <a href={CHECKOUT_URL} className="block bg-white/5 hover:bg-white/10 border border-celeste-400/40 rounded-xl p-4 transition">
