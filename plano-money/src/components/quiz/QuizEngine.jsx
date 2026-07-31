@@ -66,6 +66,41 @@ function Blobs() {
   )
 }
 
+// Revela cada mensaje en secuencia con su propia barra de progreso, en vez
+// de un único spinner con un mensaje fijo — sube el valor percibido del
+// análisis sin necesitar ninguna cifra (de usuarios, etc.) que no podamos
+// respaldar.
+function LoadingStages({ messages, duration }) {
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  useEffect(() => {
+    if (activeIndex >= messages.length - 1) return
+    const perStage = duration / messages.length
+    const t = setTimeout(() => setActiveIndex(i => i + 1), perStage)
+    return () => clearTimeout(t)
+  }, [activeIndex, messages.length, duration])
+
+  return (
+    <div className="py-6 space-y-5">
+      <div className="w-16 h-16 mx-auto border-[6px] border-lila-100 border-t-lila-500 rounded-full animate-spin" />
+      <div className="space-y-3 max-w-xs mx-auto">
+        {messages.map((msg, i) => (
+          <div key={i} className={`text-left transition-opacity duration-300 ${i <= activeIndex ? 'opacity-100' : 'opacity-30'}`}>
+            <p className="text-sm font-bold text-navy-900">{msg}</p>
+            <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r from-lila-500 to-celeste-500 transition-all ease-linear ${
+                  i < activeIndex ? 'w-full duration-300' : i === activeIndex ? 'w-full duration-[1500ms]' : 'w-0 duration-0'
+                }`}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const EMOJI_SCALE = ['👎', '👎', '🤷', '👍', '👍']
 
 export default function QuizEngine({ data }) {
@@ -290,11 +325,15 @@ export default function QuizEngine({ data }) {
           )}
 
           {step.type === 'loading' && (
-            <div className="text-center py-8 space-y-5">
-              <div className="w-20 h-20 mx-auto border-[6px] border-lila-100 border-t-lila-500 rounded-full animate-spin" />
-              <p className="font-bold text-navy-900 text-lg">{fill(step.message)}</p>
-              {step.trust && <p className="text-sm text-slate-400">{step.trust}</p>}
-            </div>
+            step.messages ? (
+              <LoadingStages messages={step.messages.map(fill)} duration={step.duration || 5000} />
+            ) : (
+              <div className="text-center py-8 space-y-5">
+                <div className="w-20 h-20 mx-auto border-[6px] border-lila-100 border-t-lila-500 rounded-full animate-spin" />
+                <p className="font-bold text-navy-900 text-lg">{fill(step.message)}</p>
+                {step.trust && <p className="text-sm text-slate-400">{step.trust}</p>}
+              </div>
+            )
           )}
 
           {step.type === 'gauge' && (
@@ -332,8 +371,18 @@ export default function QuizEngine({ data }) {
           {step.type === 'result' && (
             <div className="text-center space-y-4">
               <span className="inline-block text-xs font-bold uppercase bg-brand-100 text-brand-700 px-3 py-1.5 rounded-full">Diagnóstico personalizado</span>
-              <h2 className="text-2xl font-black text-navy-900">{firstName ? `${firstName}, tu perfil es:` : 'Tu perfil es:'}</h2>
-              <p className="text-xl font-black bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 bg-clip-text text-transparent">{profile.title}</p>
+              <h2 className="text-2xl font-black text-navy-900">
+                {firstName ? `${firstName}, detectamos ${profile.findings.length} problemas:` : `Detectamos ${profile.findings.length} problemas:`}
+              </h2>
+              <div className="text-left space-y-2 bg-slate-50 rounded-xl p-4">
+                {profile.findings.map((f, i) => (
+                  <p key={i} className="text-sm text-slate-700 flex gap-2"><span className="text-emerald-500 font-bold shrink-0">✓</span>{f}</p>
+                ))}
+              </div>
+              <p className="text-base font-bold text-navy-900">
+                Por eso te recomendamos <span className="bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 bg-clip-text text-transparent">Plano.Money</span>.
+              </p>
+              <p className="text-lg font-black text-navy-900">{profile.title}</p>
               <p className="text-base text-slate-600">{profile.description}</p>
               {answers.deseo && (
                 <p className="text-base text-slate-600">
