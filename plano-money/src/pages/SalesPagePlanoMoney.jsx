@@ -272,16 +272,13 @@ export default function SalesPagePlanoMoney() {
           </div>
 
           {/* Seals */}
-          <div className="flex items-start justify-center gap-4 sm:gap-8 overflow-x-auto px-2 pt-2">
+          <div className="flex flex-wrap items-start justify-center gap-4 sm:gap-8 px-2 pt-4">
             {SEALS.map(s => <Seal key={s.label} {...s} />)}
           </div>
         </div>
       </section>
 
-      <footer className="max-w-2xl mx-auto px-4 pb-10 text-center space-y-2">
-        <p className="text-base text-slate-400 leading-relaxed">
-          Plano.Money es una herramienta de organización financiera personal. No constituye asesoría financiera profesional ni garantiza resultados de ahorro específicos. Estos dependen de las decisiones y hábitos de cada usuario.
-        </p>
+      <footer className="max-w-2xl mx-auto px-4 pb-10 pt-6 text-center">
         <p className="text-base text-slate-300">© {new Date().getFullYear()} Novi Global International S.A. · Plano.Money. Todos los derechos reservados.</p>
       </footer>
     </div>
