@@ -9,6 +9,38 @@ import Logo from '../components/Logo.jsx'
 const CHECKOUT_URL = 'https://pay.hotmart.com/P106882' // plan mensual (US$ 5.99/mes)
 const CHECKOUT_URL_ANNUAL = 'https://pay.hotmart.com/P106882' // plan anual (US$ 35.99/año)
 
+// Cada key corresponde al `profile.key` que arma computeProfile() en
+// planoMoneyQuiz.js — el quiz manda a la persona a /oferta?p=<key> y acá
+// elegimos el título/subtítulo que sigue el hilo de su problema puntual.
+// 'reactivo' es el genérico, para tráfico que no pasó por el quiz.
+const PROFILE_HERO = {
+  pareja: {
+    navy: 'Dejá de pelear por la plata,',
+    gradient: 'y empiecen a decidir juntos, con números claros',
+    subtitle: 'Plano.Money te da una vista compartida de los gastos de tu familia. Cada uno ve lo que le corresponde, sin señalar con el dedo.',
+  },
+  ingreso_variable: {
+    navy: 'Dejá de preguntarte a dónde se fue tu sueldo,',
+    gradient: 'incluso si tus ingresos cambian cada mes',
+    subtitle: 'Ya sea que administres tu hogar, compartas gastos con tu pareja, seas emprendedor o trabajes de forma independiente, vas a tener una visión clara de tu dinero, sin planillas complicadas ni cálculos difíciles.',
+  },
+  comprador_emocional: {
+    navy: 'Dejá de arrepentirte de compras que hacés sin pensar,',
+    gradient: 'y tomá el control antes de gastar, no después',
+    subtitle: 'Plano.Money te muestra el impacto real de cada gasto antes de que se te escape de las manos. Así decidís con la cabeza fría, no con culpa después.',
+  },
+  reactivo: {
+    navy: 'No te falta disciplina,',
+    gradient: 'te falta un sistema que te muestre a dónde va tu plata',
+    subtitle: 'Ya sea que administres tu hogar, compartas gastos con tu pareja, seas emprendedor o trabajes de forma independiente, vas a tener una visión clara de tu dinero, sin planillas complicadas ni cálculos difíciles.',
+  },
+}
+
+function getProfileHero() {
+  const key = new URLSearchParams(window.location.search).get('p')
+  return PROFILE_HERO[key] || PROFILE_HERO.reactivo
+}
+
 const BENEFITS = [
   { icon: '💰', text: 'Saber cuánto entra' },
   { icon: '📉', text: 'Saber cuánto sale' },
@@ -109,6 +141,7 @@ function DemoVideo() {
 }
 
 export default function SalesPagePlanoMoney() {
+  const hero = getProfileHero()
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Trust bar */}
@@ -128,14 +161,13 @@ export default function SalesPagePlanoMoney() {
         <div className="max-w-3xl mx-auto text-center space-y-5">
           <Logo className="w-24 h-24 sm:w-28 sm:h-28 mx-auto" />
           <h1 className="text-5xl sm:text-7xl font-black text-navy-900 leading-tight">
-            Dejá de preguntarte<br className="hidden sm:block" />{' '}
-            a dónde se fue tu sueldo,{' '}
+            {hero.navy}{' '}
             <span className="bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 bg-clip-text text-transparent">
-              incluso si tus ingresos cambian cada mes
+              {hero.gradient}
             </span>
           </h1>
           <p className="text-slate-500 text-xl sm:text-2xl max-w-xl mx-auto">
-            Ya sea que administres tu hogar, compartas gastos con tu pareja, seas emprendedor o trabajes de forma independiente, vas a tener una visión clara de tu dinero, sin planillas complicadas ni cálculos difíciles.
+            {hero.subtitle}
           </p>
           <a
             href={CHECKOUT_URL}

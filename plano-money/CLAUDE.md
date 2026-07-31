@@ -31,6 +31,20 @@ scratch:
 - **Funnel position**: Quiz → this offer page → real Hotmart checkout
   (order bump / upsell / downsell only exist on Hotmart's actual checkout,
   never faked on our own pages).
+- **Quiz-to-offer personalization (standing pattern, keep doing this)**:
+  the quiz computes a `profile` (`computeProfile()` in the quiz's data
+  file) representing which of a handful of real, distinct problems the
+  person has. The quiz's final step appends that profile's `key` to the
+  offer URL as `?p=<key>` (see `QuizEngine.jsx`'s `salesPage` step). The
+  offer page reads that param (`getProfileHero()` in
+  `SalesPagePlanoMoney.jsx`) and swaps just the hero headline + subtitle
+  to speak directly to that problem, with copy/psychology matched to it,
+  defaulting to a generic variant when there's no param (cold traffic
+  that skipped the quiz). Don't fork this into separate page files per
+  profile — one page, one small config map keyed by profile, everything
+  else (mockup, video, benefits, testimonials, pricing) stays shared so
+  edits never need to be repeated per-variant. Apply this same pattern to
+  any future quiz+offer pair.
 - Two-repo sync discipline still applies: this workspace
   (`marianogomezpru-max/Plano.Money`, `main`) mirrors
   `/home/user/copia-madmuscles/plano-money`

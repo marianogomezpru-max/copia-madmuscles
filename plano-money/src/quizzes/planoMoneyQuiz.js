@@ -230,28 +230,35 @@ export const PLANO_MONEY_QUIZ = {
     return Math.max(5, Math.min(95, Math.round(score)))
   },
 
+  // `key` identifies which /oferta hero variant (PROFILE_HERO in
+  // SalesPagePlanoMoney.jsx) picks up the thread after the quiz — keep
+  // both in sync if a profile is added, renamed, or removed here.
   computeProfile(answers) {
     if (answers.area_afectada === 'pareja') {
       return {
+        key: 'pareja',
         title: 'El Equipo Desalineado',
         description: 'El dinero se volvió un tema de tensión en pareja o familia más que de números. Tu plan se enfoca en organizar las cuentas compartidas para bajar la fricción.',
       }
     }
     if (answers.situacion === 'comerciante' || answers.situacion === 'independiente') {
       return {
+        key: 'ingreso_variable',
         title: 'El Ingreso Variable Sin Sistema',
         description: 'Tus ingresos cambian mes a mes, y hoy los administrás "a ojo". Tu plan se enfoca en crear un colchón que te dé estabilidad incluso en los meses flojos.',
       }
     }
     if (answers.emocion === 'culpa' || answers.acuerdo_gasto >= 4) {
       return {
+        key: 'comprador_emocional',
         title: 'El Comprador Emocional',
         description: 'Gran parte de tus gastos responden a una emoción del momento, no a un plan. Tu plan se enfoca en identificar esos disparadores antes de que aparezcan.',
       }
     }
     return {
+      key: 'reactivo',
       title: 'El Reactivo Sin Sistema',
-      description: 'No te falta disciplina — te falta un sistema simple que te muestre a dónde va tu plata sin esfuerzo. Es exactamente lo que Plano.Money hace por vos.',
+      description: 'No te falta disciplina. Te falta un sistema simple que te muestre a dónde va tu plata sin esfuerzo. Es exactamente lo que Plano.Money hace por vos.',
     }
   },
 }

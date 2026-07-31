@@ -109,6 +109,8 @@ export default function QuizEngine({ data }) {
   // ---------- Sales page (final, own layout) ----------
   if (step.type === 'salesPage') {
     const sp = step
+    const profileKey = data.computeProfile(answers).key
+    const offerUrl = profileKey ? `${sp.checkoutUrl}${sp.checkoutUrl.includes('?') ? '&' : '?'}p=${profileKey}` : sp.checkoutUrl
     return (
       <div className="min-h-screen bg-slate-50 pb-10">
         <div className="max-w-md mx-auto px-4 pt-8 space-y-5">
@@ -132,7 +134,7 @@ export default function QuizEngine({ data }) {
           <div className="bg-navy-900 text-white p-5 rounded-2xl text-center space-y-3">
             {sp.originalPrice && <p className="text-sm line-through text-slate-400">{sp.originalPrice}</p>}
             <p className="text-3xl font-black">{sp.price}</p>
-            <a href={sp.checkoutUrl} className="block w-full bg-white text-navy-900 font-bold py-3 rounded-xl text-sm">
+            <a href={offerUrl} className="block w-full bg-white text-navy-900 font-bold py-3 rounded-xl text-sm">
               {sp.cta}
             </a>
           </div>
