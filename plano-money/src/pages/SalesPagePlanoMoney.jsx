@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Lock, Clock, Mail, BadgeCheck, Play } from 'lucide-react'
+import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Clock, BadgeCheck, Play } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 
 // TODO: reemplazar por el link real del checkout de Hotmart (Plano.Money).
@@ -269,12 +269,6 @@ export default function SalesPagePlanoMoney() {
             >
               Quiero ordenar mis finanzas →
             </a>
-            <p className="relative text-white/50 text-base">🎁 En el siguiente paso vas a poder sumar contenido extra con descuento especial.</p>
-            <div className="relative flex items-center justify-center gap-4 text-white/50 text-base pt-1">
-              <span className="flex items-center gap-1"><Lock className="w-4 h-4" /> Pago seguro</span>
-              <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Acceso inmediato</span>
-              <span className="flex items-center gap-1"><Mail className="w-4 h-4" /> Soporte por mail</span>
-            </div>
           </div>
 
           {/* Seals */}
