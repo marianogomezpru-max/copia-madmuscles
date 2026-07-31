@@ -205,7 +205,7 @@ export default function SalesPagePlanoMoney() {
       {/* What's included */}
       <section className="bg-gradient-to-br from-brand-50 via-white to-celeste-50 py-8 px-4">
         <div className="max-w-xl mx-auto space-y-6">
-          <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">Todo lo que obtenés</h2>
+          <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">Todo lo que necesitás para ordenar tus finanzas</h2>
           <div className="space-y-2.5">
             {INCLUDES.map((item, i) => (
               <div key={item} className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
@@ -215,7 +215,7 @@ export default function SalesPagePlanoMoney() {
             ))}
           </div>
 
-          <p className="text-center font-black text-navy-900 text-2xl sm:text-3xl pt-4">Incluye 3 Bonos Interactivos que te ayudarán en tu proceso</p>
+          <p className="text-center font-black text-navy-900 text-2xl sm:text-3xl pt-4">Recursos adicionales incluidos</p>
           <div className="grid sm:grid-cols-3 gap-4">
             {BONUSES.map(b => (
               <div key={b.title} className="bg-navy-900 rounded-2xl p-6 text-center space-y-2 shadow-md">
