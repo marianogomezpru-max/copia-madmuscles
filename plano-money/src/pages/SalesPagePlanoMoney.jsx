@@ -1,32 +1,37 @@
-import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Lock, Clock, Mail, BadgeCheck } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Lock, Clock, Mail, BadgeCheck, Play } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 
 // TODO: reemplazar por el link real del checkout de Hotmart (Plano.Money).
 const CHECKOUT_URL = 'https://pay.hotmart.com/P106882'
 
 const BENEFITS = [
-  'Saber exactamente cuánto dinero entra, cuánto sale y cuánto podés gastar.',
-  'Organizar tus finanzas personales, familiares o las de tu negocio en un solo lugar.',
-  'Administrar con tranquilidad incluso cuando tus ingresos cambian.',
-  'Planificar metas de ahorro, vacaciones y proyectos con mayor claridad.',
-  'Tomar mejores decisiones financieras todos los días.',
+  { icon: '💰', text: 'Saber cuánto entra' },
+  { icon: '📉', text: 'Saber cuánto sale' },
+  { icon: '🏦', text: 'Ahorrar todos los meses' },
+  { icon: '🎯', text: 'Cumplir tus objetivos' },
 ]
 
-const DOT_COLORS = ['bg-lila-500', 'bg-celeste-500', 'bg-brand-500']
-
 const TESTIMONIALS = [
-  { name: 'Carolina M.', role: 'Madre de familia', photo: '/testimonio-carolina.png', quote: 'Antes el dinero desaparecía antes de fin de mes. Ahora sé exactamente en qué se va, y empezamos un fondo para vacaciones.', accent: 'bg-celeste-500' },
-  { name: 'Federico H.', role: 'Diseñador freelance', photo: '/testimonio-federico.png', quote: 'Mis ingresos cambian cada mes, pero con Plano.Money por fin puedo planear y ahorrar con confianza.', accent: 'bg-brand-500' },
-  { name: 'Mariana y Diego', role: 'Padres de familia', photo: '/testimonio-pareja.png', quote: 'Dejamos de pelear por los gastos. Ahora armamos el presupuesto juntos y hasta ahorramos para nuestras vacaciones.', accent: 'bg-lila-500' },
+  { name: 'Carolina M.', role: 'Madre de familia', photo: '/testimonio-carolina.png', quote: 'Por primera vez sé exactamente cuánto puedo gastar sin preocuparme.', accent: 'bg-celeste-500' },
+  { name: 'Federico H.', role: 'Diseñador freelance', photo: '/testimonio-federico.png', quote: 'Por fin puedo ahorrar, aunque mis ingresos cambien cada mes.', accent: 'bg-brand-500' },
+  { name: 'Mariana y Diego', role: 'Padres de familia', photo: '/testimonio-pareja.png', quote: 'Dejamos de discutir por la plata — ahora decidimos juntos.', accent: 'bg-lila-500' },
 ]
 
 const INCLUDES = [
-  'Acceso completo a Plano.Money',
-  'Bono interactivo: ¿Qué Comprador Eres?',
-  'Bono interactivo: 21 Días para Reprogramar tu Cerebro Financiero',
-  'Bono interactivo: Piensa Antes de Comprar',
-  'Actualizaciones incluidas, sin costo extra',
-  'Compatible con celular, tablet y computadora',
+  'Presupuesto familiar',
+  'Registro inteligente de gastos',
+  'Metas de ahorro',
+  'Reportes automáticos',
+  'Coach financiero IA',
+  'Acceso desde celular y computadora',
+  'Actualizaciones incluidas',
+]
+
+const BONUSES = [
+  { icon: '🛍️', title: '¿Qué Comprador Eres?', text: 'Bono interactivo' },
+  { icon: '🧠', title: '21 Días para Reprogramar tu Cerebro Financiero', text: 'Bono interactivo' },
+  { icon: '🎯', title: 'Piensa Antes de Comprar', text: 'Bono interactivo' },
 ]
 
 const TRUST_GRID = [
@@ -67,6 +72,38 @@ function Seal({ icon: Icon, label, sublabel, gradient, ribbon }) {
   )
 }
 
+function DemoVideo() {
+  const videoRef = useRef(null)
+  const [playing, setPlaying] = useState(false)
+
+  return (
+    <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-accent-600/20 border-4 border-white ring-1 ring-slate-200 bg-navy-900">
+      <video
+        ref={videoRef}
+        src="/demo-plano-money.mp4"
+        poster="/demo-poster.jpg"
+        controls
+        playsInline
+        preload="metadata"
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        className="w-full max-h-[80vh] mx-auto block"
+      />
+      {!playing && (
+        <button
+          onClick={() => videoRef.current?.play()}
+          aria-label="Reproducir video"
+          className="absolute inset-0 flex items-center justify-center group"
+        >
+          <span className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-red-600 flex items-center justify-center shadow-2xl ring-4 ring-white/30 group-hover:scale-110 transition">
+            <Play className="w-9 h-9 sm:w-11 sm:h-11 text-white fill-white ml-1" />
+          </span>
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function SalesPagePlanoMoney() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
@@ -87,9 +124,10 @@ export default function SalesPagePlanoMoney() {
         <div className="max-w-3xl mx-auto text-center space-y-5">
           <Logo className="w-14 h-14 mx-auto" />
           <h1 className="text-5xl sm:text-7xl font-black text-navy-900 leading-tight">
-            Tomá el control de tu dinero,<br className="hidden sm:block" />{' '}
+            Dejá de preguntarte<br className="hidden sm:block" />{' '}
+            a dónde se fue tu sueldo,{' '}
             <span className="bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 bg-clip-text text-transparent">
-              incluso cuando tus ingresos cambian
+              incluso si tus ingresos cambian cada mes
             </span>
           </h1>
           <p className="text-slate-500 text-xl sm:text-2xl max-w-xl mx-auto">
@@ -99,12 +137,12 @@ export default function SalesPagePlanoMoney() {
             href={CHECKOUT_URL}
             className="inline-block bg-gradient-to-r from-lila-500 via-accent-600 to-celeste-500 hover:brightness-110 text-white font-bold py-4 px-9 rounded-full text-xl shadow-xl shadow-accent-600/30 transition hover:scale-105"
           >
-            Empezar ahora →
+            Quiero ordenar mis finanzas →
           </a>
         </div>
 
         {/* Big device mockup */}
-        <div className="relative max-w-5xl mx-auto mt-8">
+        <div className="relative max-w-7xl mx-auto mt-8">
           <img
             src="/hero-mockup.png"
             alt="Plano.Money en laptop y celular"
@@ -119,27 +157,18 @@ export default function SalesPagePlanoMoney() {
         <p className="text-slate-500 text-lg sm:text-xl max-w-lg mx-auto mt-2 mb-6">
           Descubrí en menos de 2 minutos cómo Plano.Money te ayuda a organizar ingresos, controlar gastos y alcanzar tus metas.
         </p>
-        <div className="rounded-3xl overflow-hidden shadow-2xl shadow-accent-600/20 border-4 border-white ring-1 ring-slate-200 bg-navy-900">
-          <video
-            src="/demo-plano-money.mp4"
-            poster="/demo-poster.jpg"
-            controls
-            playsInline
-            preload="metadata"
-            className="w-full max-h-[80vh] mx-auto block"
-          />
-        </div>
+        <DemoVideo />
       </section>
 
       {/* Benefits — outcome checklist */}
       <section className="bg-gradient-to-br from-celeste-50 via-white to-lila-50 py-14 px-4">
         <div className="max-w-2xl mx-auto space-y-8">
           <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">¿Qué vas a lograr con Plano.Money?</h2>
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
-            {BENEFITS.map((b, i) => (
-              <div key={b} className="flex items-start gap-3">
-                <span className={`w-3 h-3 rounded-full mt-2.5 shrink-0 ${DOT_COLORS[i % DOT_COLORS.length]}`} />
-                <p className="text-lg sm:text-xl text-slate-700">{b}</p>
+          <div className="grid grid-cols-2 gap-4">
+            {BENEFITS.map(b => (
+              <div key={b.text} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 text-center space-y-2">
+                <p className="text-4xl">{b.icon}</p>
+                <p className="text-lg sm:text-xl font-bold text-navy-900">{b.text}</p>
               </div>
             ))}
           </div>
@@ -176,12 +205,23 @@ export default function SalesPagePlanoMoney() {
       {/* What's included */}
       <section className="bg-gradient-to-br from-brand-50 via-white to-celeste-50 py-14 px-4">
         <div className="max-w-xl mx-auto space-y-6">
-          <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">Tu compra incluye</h2>
+          <h2 className="text-4xl sm:text-5xl font-black text-navy-900 text-center">Todo lo que obtenés</h2>
           <div className="space-y-2.5">
             {INCLUDES.map((item, i) => (
               <div key={item} className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm">
                 <BadgeCheck className={`w-5 h-5 shrink-0 ${['text-lila-500', 'text-celeste-500', 'text-brand-500'][i % 3]}`} />
                 <p className="text-lg text-slate-700">{item}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center font-bold text-navy-900 text-lg pt-2">+ de regalo, 3 bonos interactivos</p>
+          <div className="grid sm:grid-cols-3 gap-3">
+            {BONUSES.map(b => (
+              <div key={b.title} className="bg-white border border-slate-200 rounded-xl p-4 text-center space-y-1 shadow-sm">
+                <p className="text-3xl">{b.icon}</p>
+                <p className="font-bold text-navy-900 text-sm leading-tight">{b.title}</p>
+                <p className="text-xs text-slate-400">{b.text}</p>
               </div>
             ))}
           </div>
@@ -228,7 +268,7 @@ export default function SalesPagePlanoMoney() {
               href={CHECKOUT_URL}
               className="relative block w-full bg-gradient-to-r from-lila-400 via-white to-celeste-300 text-navy-900 font-bold py-4 rounded-xl text-xl hover:brightness-105 transition"
             >
-              Empezar ahora →
+              Quiero ordenar mis finanzas →
             </a>
             <p className="relative text-white/50 text-base">🎁 En el siguiente paso vas a poder sumar contenido extra con descuento especial.</p>
             <div className="relative flex items-center justify-center gap-4 text-white/50 text-base pt-1">
