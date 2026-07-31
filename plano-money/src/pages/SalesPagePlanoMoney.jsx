@@ -302,13 +302,16 @@ export default function SalesPagePlanoMoney() {
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-celeste-500/30 rounded-full blur-2xl" />
             <p className="relative text-white text-xl font-black uppercase">Empezá hoy</p>
 
-            <div className="relative grid grid-cols-2 gap-3">
+            <div className="relative grid grid-cols-2 gap-3 mt-3">
               <a href={CHECKOUT_URL} className="block bg-white/5 hover:bg-white/10 border border-celeste-400/40 rounded-xl p-4 transition">
                 <span className="inline-block bg-celeste-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">Mensual</span>
                 <p className="mt-2 text-2xl font-bold text-white/50 line-through">US$ 12.99</p>
                 <p className="text-3xl sm:text-4xl font-black text-white">US$ 5.99<span className="text-base font-semibold text-white/60">/mes</span></p>
               </a>
-              <a href={CHECKOUT_URL_ANNUAL} className="block bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/40 rounded-xl p-4 transition">
+              <a href={CHECKOUT_URL_ANNUAL} className="relative block bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/40 rounded-xl p-4 transition">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-navy-900 text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow whitespace-nowrap">
+                  🔥 Más elegido
+                </span>
                 <span className="inline-block bg-emerald-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">Anual</span>
                 <p className="mt-2 text-2xl font-bold text-white/50 line-through">US$ 155.99</p>
                 <p className="text-3xl sm:text-4xl font-black text-white">US$ 35.99<span className="text-base font-semibold text-white/60">/año</span></p>
