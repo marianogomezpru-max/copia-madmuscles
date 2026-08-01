@@ -14,6 +14,7 @@ import QuizPlanoMoneyPage from './pages/QuizPlanoMoneyPage.jsx'
 import UpsellDominaTuDineroPage from './pages/UpsellDominaTuDineroPage.jsx'
 import DownsellEmocionYDineroPage from './pages/DownsellEmocionYDineroPage.jsx'
 import SalesPagePlanoMoney from './pages/SalesPagePlanoMoney.jsx'
+import GraciasPage from './pages/GraciasPage.jsx'
 import './index.css'
 
 // Minimal path-based routing — the main app has no router (it's a single
@@ -33,6 +34,7 @@ const ROUTES = {
   '/upsell-domina-tu-dinero': UpsellDominaTuDineroPage,
   '/downsell-emocion-y-dinero': DownsellEmocionYDineroPage,
   '/oferta': SalesPagePlanoMoney,
+  '/gracias': GraciasPage,
 }
 
 const RootComponent = ROUTES[window.location.pathname] || App
