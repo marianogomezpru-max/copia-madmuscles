@@ -5,9 +5,7 @@ import Logo from '../components/Logo.jsx'
 // Son dos ofertas separadas en Hotmart (cada una con su propia Página de
 // Pago Personalizada, order bump, upsell y downsell) — no una sola con
 // selector de plan.
-// TODO: CHECKOUT_URL (mensual) todavía es el placeholder — reemplazar por
-// el link real cuando esté publicado, igual que se hizo con el anual.
-const CHECKOUT_URL = 'https://pay.hotmart.com/P106882' // plan mensual (US$ 5.99/mes)
+const CHECKOUT_URL = 'https://pay.hotmart.com/P106882482G?off=8ghbb70e&checkoutMode=10' // plan mensual (US$ 5.99/mes)
 const CHECKOUT_URL_ANNUAL = 'https://pay.hotmart.com/P106882482G?off=vfcoe73u&checkoutMode=10' // plan anual (US$ 35.99/año)
 
 // Cada key corresponde al `profile.key` que arma computeProfile() en
