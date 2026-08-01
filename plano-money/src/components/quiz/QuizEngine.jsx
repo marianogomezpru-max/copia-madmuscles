@@ -151,10 +151,10 @@ export default function QuizEngine({ data }) {
   const profile = data.computeProfile(answers)
   const score = data.computeScore(answers)
   const scoreZone = score < 33.3
-    ? { label: 'Zona Roja', color: 'text-red-400' }
+    ? { label: 'Zona Roja', bg: 'bg-red-600' }
     : score < 66.7
-      ? { label: 'Zona Amarilla', color: 'text-amber-400' }
-      : { label: 'Zona Verde', color: 'text-emerald-400' }
+      ? { label: 'Zona Amarilla', bg: 'bg-amber-500' }
+      : { label: 'Zona Verde', bg: 'bg-emerald-600' }
   const offerUrl = `/oferta?p=${profile.key}`
 
   // ---------- Landing ----------
@@ -408,14 +408,14 @@ export default function QuizEngine({ data }) {
                 <SummaryRow label="Prioridad" value={profile.priority} />
               </div>
 
-              <div className="bg-navy-900 rounded-xl p-4 flex items-center justify-between gap-3">
+              <div className={`${scoreZone.bg} rounded-xl p-4 flex items-center justify-between gap-3`}>
                 <div className="text-left">
-                  <p className="text-white/70 text-xs font-bold uppercase">Salud financiera</p>
+                  <p className="text-white/80 text-xs font-bold uppercase">Salud financiera</p>
                   <p className="text-white text-xs mt-0.5">En 30 días podés mejorar este puntaje.</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className={`text-3xl font-black ${scoreZone.color}`}>{score}<span className="text-base font-semibold text-white/50">/100</span></p>
-                  <p className={`text-xs font-bold uppercase ${scoreZone.color}`}>{scoreZone.label}</p>
+                  <p className="text-3xl font-black text-white">{score}<span className="text-base font-semibold text-white/70">/100</span></p>
+                  <p className="text-xs font-bold uppercase text-white">{scoreZone.label}</p>
                 </div>
               </div>
 
