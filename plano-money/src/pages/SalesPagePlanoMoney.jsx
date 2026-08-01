@@ -2,12 +2,13 @@ import { useRef, useState } from 'react'
 import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Clock, BadgeCheck, Play } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
 
-// TODO: reemplazar por los links reales del checkout de Hotmart (Plano.Money).
 // Son dos ofertas separadas en Hotmart (cada una con su propia Página de
 // Pago Personalizada, order bump, upsell y downsell) — no una sola con
-// selector de plan, así que necesitamos los dos links.
+// selector de plan.
+// TODO: CHECKOUT_URL (mensual) todavía es el placeholder — reemplazar por
+// el link real cuando esté publicado, igual que se hizo con el anual.
 const CHECKOUT_URL = 'https://pay.hotmart.com/P106882' // plan mensual (US$ 5.99/mes)
-const CHECKOUT_URL_ANNUAL = 'https://pay.hotmart.com/P106882' // plan anual (US$ 35.99/año)
+const CHECKOUT_URL_ANNUAL = 'https://pay.hotmart.com/P106882482G?off=vfcoe73u&checkoutMode=10' // plan anual (US$ 35.99/año)
 
 // Cada key corresponde al `profile.key` que arma computeProfile() en
 // planoMoneyQuiz.js — el quiz manda a la persona a /oferta?p=<key> y acá
