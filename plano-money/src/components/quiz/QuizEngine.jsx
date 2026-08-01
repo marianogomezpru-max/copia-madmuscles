@@ -57,6 +57,16 @@ function OptionCard({ option, selected, onClick, multi, accentIndex }) {
   )
 }
 
+function SummaryRow({ label, value }) {
+  if (!value) return null
+  return (
+    <div className="flex justify-between gap-3 text-sm">
+      <span className="text-slate-400 font-semibold shrink-0">{label}</span>
+      <span className="text-navy-900 font-bold text-right">{value}</span>
+    </div>
+  )
+}
+
 function Blobs() {
   return (
     <>
@@ -139,6 +149,7 @@ export default function QuizEngine({ data }) {
   const deseoLabel = data.deseoLabels?.[answers.deseo] || 'lograr lo que te propongas'
   const fill = str => str.replace('{{name}}', firstName).replace('{{deseo}}', deseoLabel)
   const profile = data.computeProfile(answers)
+  const score = data.computeScore(answers)
   const offerUrl = `/oferta?p=${profile.key}`
 
   // ---------- Landing ----------
@@ -212,6 +223,7 @@ export default function QuizEngine({ data }) {
                 placeholder="tu@email.com"
                 className="w-full px-4 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               />
+              {step.trustNote && <p className="text-xs text-slate-400">{step.trustNote}</p>}
             </>
           )}
 
@@ -382,6 +394,23 @@ export default function QuizEngine({ data }) {
               <p className="text-base font-bold text-navy-900">
                 Por eso te recomendamos <span className="bg-gradient-to-r from-lila-600 via-accent-600 to-celeste-600 bg-clip-text text-transparent">Plano.Money</span>.
               </p>
+
+              <div className="text-left bg-white border border-slate-200 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-bold uppercase text-slate-400">Lo que detectamos</p>
+                <SummaryRow label="Ingresos" value={data.incomeLabels?.[answers.situacion]} />
+                <SummaryRow label="Principal desafío" value={profile.challenge} />
+                <SummaryRow label="Objetivo principal" value={data.goalLabels?.[answers.objetivo_principal]} />
+                <SummaryRow label="Prioridad" value={profile.priority} />
+              </div>
+
+              <div className="bg-navy-900 rounded-xl p-4 flex items-center justify-between gap-3">
+                <div className="text-left">
+                  <p className="text-white/70 text-xs font-bold uppercase">Salud financiera</p>
+                  <p className="text-white text-xs mt-0.5">En 30 días podés mejorar este puntaje.</p>
+                </div>
+                <p className="text-white text-3xl font-black shrink-0">{score}<span className="text-base font-semibold text-white/50">/100</span></p>
+              </div>
+
               <p className="text-lg font-black text-navy-900">{profile.title}</p>
               <p className="text-base text-slate-600">{profile.description}</p>
               {answers.deseo && (
@@ -392,6 +421,13 @@ export default function QuizEngine({ data }) {
               {profile.image && (
                 <div className="rounded-2xl overflow-hidden border-4 border-white ring-1 ring-slate-200 shadow-lg">
                   <img src={profile.image} alt={profile.imageAlt || ''} className="w-full h-44 sm:h-52 object-cover object-top" />
+                </div>
+              )}
+
+              {profile.firstStep && (
+                <div className="text-left bg-lila-50 border border-lila-200 rounded-xl p-4">
+                  <p className="text-xs font-bold uppercase text-lila-600 mb-1">Primer paso recomendado</p>
+                  <p className="text-sm text-slate-700">{profile.firstStep}</p>
                 </div>
               )}
             </div>

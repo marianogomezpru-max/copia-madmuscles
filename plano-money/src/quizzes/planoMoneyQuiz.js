@@ -27,6 +27,22 @@ export const PLANO_MONEY_QUIZ = {
     tranquilidad: 'vivir sin pensar en plata todo el tiempo',
   },
 
+  // Traducen las respuestas crudas al resumen "Lo que detectamos" del
+  // paso 'result' (ver QuizEngine.jsx) — mismos values que las opciones
+  // de 'situacion' y 'objetivo_principal' de arriba.
+  incomeLabels: {
+    empleo_fijo: 'Sueldo fijo',
+    empleo_comision: 'Ingresos variables',
+    comerciante: 'Negocio propio',
+    independiente: 'Freelance',
+  },
+  goalLabels: {
+    deudas: 'Salir de deudas',
+    ahorrar: 'Ahorrar',
+    controlar_gastos: 'Controlar mis gastos',
+    dejar_de_preocuparme: 'Tener más tranquilidad',
+  },
+
   landing: {
     kicker: 'Diagnóstico Financiero Gratuito',
     title: '¿Sentís que el dinero desaparece antes de terminar el mes?',
@@ -214,6 +230,7 @@ export const PLANO_MONEY_QUIZ = {
       key: 'email',
       question: 'Dejanos tu mail para enviarte tu diagnóstico',
       note: 'Asegurate de que sea válido: ahí te llega también tu diagnóstico completo.',
+      trustNote: 'Solo lo usamos para enviarte tu diagnóstico y recomendaciones.',
       cta: 'Ver mi resultado →',
     },
     // Última pantalla del quiz: el diagnóstico personalizado, con los
@@ -253,7 +270,9 @@ export const PLANO_MONEY_QUIZ = {
   // is the real app screenshot shown alongside the diagnosis on the
   // result step. `findings` are the 3 checkmarked problems shown on that
   // same screen, right before the diagnosis names Plano.Money as the
-  // recommendation.
+  // recommendation. `challenge`/`priority` feed the "Lo que detectamos"
+  // summary table; `firstStep` is the concrete first action shown right
+  // before the CTA.
   computeProfile(answers) {
     if (answers.area_afectada === 'pareja') {
       return {
@@ -265,6 +284,9 @@ export const PLANO_MONEY_QUIZ = {
           'El dinero se convirtió en un tema de tensión, no de números.',
           'No existe una vista clara de quién gasta qué.',
         ],
+        challenge: 'Organización familiar',
+        priority: 'Registrar gastos y crear un presupuesto compartido',
+        firstStep: 'Sumá a tu pareja o familia a un espacio compartido y registren juntos los gastos de esta semana. Después, armen un presupuesto familiar simple.',
         image: '/quiz-result-pareja.png',
         imageAlt: 'Pantalla real de Plano.Money agregando un integrante a la familia',
       }
@@ -279,6 +301,9 @@ export const PLANO_MONEY_QUIZ = {
           'Administrás tus gastos "a ojo", mes a mes.',
           'No existe un colchón para los meses flojos.',
         ],
+        challenge: 'Ingresos variables sin sistema',
+        priority: 'Registrar tus ingresos y crear un colchón para los meses flojos',
+        firstStep: 'Registrá todos tus ingresos y gastos durante los próximos 7 días, aunque varíen. Después, definí un monto fijo para guardar en los meses buenos.',
         image: '/quiz-result-ingreso-variable.png',
         imageAlt: 'Pantalla real de Plano.Money con el resumen de gastos del mes',
       }
@@ -293,6 +318,9 @@ export const PLANO_MONEY_QUIZ = {
           'Las compras por impulso se comen tu presupuesto.',
           'No existe un registro que te muestre el impacto real de cada gasto.',
         ],
+        challenge: 'Compras por impulso',
+        priority: 'Identificar qué dispara tus compras antes de gastar',
+        firstStep: 'Registrá cada gasto no planeado durante 7 días y anotá qué sentiste justo antes de hacerlo. Después, ponele un límite mensual a esa categoría.',
         image: '/quiz-result-emocional.png',
         imageAlt: 'Pantalla real de Plano.Money alertando un gasto por encima de lo presupuestado',
       }
@@ -306,6 +334,9 @@ export const PLANO_MONEY_QUIZ = {
         'Tus gastos se registran después, nunca antes.',
         'No existe un presupuesto mensual real.',
       ],
+      challenge: 'Falta de visibilidad de gastos',
+      priority: 'Registrar gastos y crear un presupuesto',
+      firstStep: 'Registrá todos tus gastos durante los próximos 7 días, sin cambiar nada todavía. Después de eso, empezá un presupuesto simple.',
       image: '/quiz-result-reactivo.png',
       imageAlt: 'Pantalla real del panel principal de Plano.Money',
     }
