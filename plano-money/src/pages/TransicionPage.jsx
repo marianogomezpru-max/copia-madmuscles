@@ -26,13 +26,15 @@ const TRANSITIONS = {
   },
   'post-upsell-si': {
     step: 2,
-    totalSteps: 2,
+    totalSteps: 3,
     checkLabel: 'Domina Tu Dinero agregado',
     statusLabel: 'Preparando todo...',
     title: '🎉 Perfecto.',
     subtitle: 'Ya quedó agregado a tu compra. No necesitás hacer nada más: se activa automáticamente junto con Plano.Money.',
+    teaserTitle: 'Antes de terminar...',
+    teaserText: 'Tenemos una última recomendación, pensada para quienes quieren resultados todavía más rápido.',
     ctaLabel: 'Continuar →',
-    ctaHref: '/gracias?o=domina',
+    ctaHref: '/downsell-emocion-y-dinero',
   },
   'post-decline': {
     step: 2,
