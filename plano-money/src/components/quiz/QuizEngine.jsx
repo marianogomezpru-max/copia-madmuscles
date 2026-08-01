@@ -389,7 +389,7 @@ export default function QuizEngine({ data }) {
             <div className="text-center space-y-4">
               <span className="inline-block text-xs font-bold uppercase bg-brand-100 text-brand-700 px-3 py-1.5 rounded-full">Diagnóstico personalizado</span>
               <h2 className="text-2xl font-black text-navy-900">
-                {firstName ? `${firstName}, detectamos ${profile.findings.length} problemas:` : `Detectamos ${profile.findings.length} problemas:`}
+                {firstName ? `${firstName}, detectamos ${profile.findings.length} oportunidades de mejora:` : `Detectamos ${profile.findings.length} oportunidades de mejora:`}
               </h2>
               <div className="text-left space-y-2 bg-slate-50 rounded-xl p-4">
                 {profile.findings.map((f, i) => (
