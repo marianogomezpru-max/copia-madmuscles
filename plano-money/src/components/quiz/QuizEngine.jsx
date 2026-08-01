@@ -150,6 +150,11 @@ export default function QuizEngine({ data }) {
   const fill = str => str.replace('{{name}}', firstName).replace('{{deseo}}', deseoLabel)
   const profile = data.computeProfile(answers)
   const score = data.computeScore(answers)
+  const scoreZone = score < 33.3
+    ? { label: 'Zona Roja', color: 'text-red-400' }
+    : score < 66.7
+      ? { label: 'Zona Amarilla', color: 'text-amber-400' }
+      : { label: 'Zona Verde', color: 'text-emerald-400' }
   const offerUrl = `/oferta?p=${profile.key}`
 
   // ---------- Landing ----------
@@ -408,7 +413,10 @@ export default function QuizEngine({ data }) {
                   <p className="text-white/70 text-xs font-bold uppercase">Salud financiera</p>
                   <p className="text-white text-xs mt-0.5">En 30 días podés mejorar este puntaje.</p>
                 </div>
-                <p className="text-white text-3xl font-black shrink-0">{score}<span className="text-base font-semibold text-white/50">/100</span></p>
+                <div className="text-right shrink-0">
+                  <p className={`text-3xl font-black ${scoreZone.color}`}>{score}<span className="text-base font-semibold text-white/50">/100</span></p>
+                  <p className={`text-xs font-bold uppercase ${scoreZone.color}`}>{scoreZone.label}</p>
+                </div>
               </div>
 
               <p className="text-lg font-black text-navy-900">{profile.title}</p>
