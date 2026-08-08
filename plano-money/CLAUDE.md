@@ -199,10 +199,18 @@ Current events, useful as the template for any future funnel:
   needed per quiz.
 
 For visual/session-level insight (heatmaps, scroll depth, session
-recordings) beyond what the Pixel's event counts show, the plan is
-Microsoft Clarity (free, no session cap unlike Hotjar's free tier) —
-not installed yet, needs a Project ID from clarity.microsoft.com when
-that's set up.
+recordings) beyond what the Pixel's event counts show, Microsoft Clarity
+is installed (Project ID `xz0hglug4b`, script in `index.html`).
+
+For cross-channel traffic (not just Facebook ads — e.g. YouTube content
+per product, direct traffic), Google Analytics 4 is also installed
+(Measurement ID `G-BK3DQRFLGP`, `gtag.js` script in `index.html`).
+GA4 account is named "Data Digital" (matches the Facebook Business
+Manager name) so future products' properties can live under the same
+account — each new product gets its own GA4 **property** named after
+the product (same pattern as the Pixel/Clarity, one tracker instance
+per product) rather than reusing this one. Web data stream points at
+`plano-money.vercel.app`.
 
 ## Gamification pattern: `Reto21Dias.jsx`
 
