@@ -40,7 +40,7 @@ const TRANSITIONS = {
     title: '🎉 Perfecto.',
     subtitle: 'Ya quedó agregado a tu compra. No necesitás hacer nada más: se activa automáticamente junto con Plano.Money.',
     teaserTitle: 'Una cosa más...',
-    teaserText: 'Ya tenés el sistema (Plano.Money) y el método (Domina Tu Dinero). Pero la mayoría de los gastos que se te escapan no son un problema de método, son un problema emocional. Emoción y Dinero es un diario de 30 días para registrar cómo te sentís junto a cada gasto, y descubrir el patrón que te hace gastar de más antes de que vuelva a pasar. El complemento que le faltaba a todo lo demás.',
+    teaserText: 'Ya tenés el sistema (Plano.Money) y el método (Domina Tu Dinero). Pero la mayoría de los gastos que se te escapan no son un problema de método, son un problema emocional. Emoción y Dinero es un diario de 30 días para registrar cómo te sentís junto a cada gasto, y reconocer el impulso antes de que se convierta en un gasto más del que te arrepentís.',
     ctaLabel: 'Continuar →',
     ctaHref: '/downsell-emocion-y-dinero',
   },
