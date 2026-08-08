@@ -1,16 +1,24 @@
 import Logo from '../components/Logo.jsx'
 
 // Pantallas de "transición" entre pasos del embudo de Hotmart (compra →
-// upsell, upsell aceptado → gracias, upsell rechazado → downsell). No
-// venden nada — preparan psicológicamente para la siguiente decisión, así
-// que se mantienen deliberadamente austeras: fondo blanco, logo, un
-// mensaje corto, una barra de progreso, un solo botón. Nada de
-// testimonios ni listas de beneficios, eso es trabajo de la oferta que
-// sigue, no de esta pantalla.
+// upsell, upsell aceptado → downsell, upsell rechazado → downsell).
 //
-// Deliberadamente sin ninguna cifra de "X% de la gente también agrega
-// esto" — no tenemos ese dato todavía, así que el texto genera
-// expectativa sin apoyarse en una estadística que no podemos respaldar.
+// El widget de Hotmart que muestra cada oferta (checkoutElements) es
+// fijo: solo nombre del producto, precio y el texto de los dos botones
+// (comprobado en el editor de la etapa — no hay campo de título ni de
+// cuerpo ahí). Eso significa que TODA la persuasión del upsell/downsell
+// tiene que pasar por acá, en la pantalla previa, no en el widget en sí
+// — por eso el teaser de cada variante es un pitch completo, no una
+// frase suelta. Cada una tiene un ángulo distinto a propósito (primera
+// oferta / ya dijiste que sí antes / ya dijiste que no antes): repetir
+// el mismo texto en las tres se siente a hueco.
+//
+// Sigue sin haber ninguna cifra de "X% de la gente también agrega esto"
+// — no tenemos ese dato, así que el texto convence por contenido
+// concreto del producto, no por presión social inventada.
+//
+// Sin video todavía — cuando haya uno real para un producto nuevo, va acá
+// mismo siguiendo el patrón de DemoVideo en SalesPagePlanoMoney.jsx.
 const TRANSITIONS = {
   'post-compra': {
     step: 1,
@@ -19,8 +27,8 @@ const TRANSITIONS = {
     statusLabel: 'Configurando tu acceso...',
     title: '🎉 ¡Excelente decisión!',
     subtitle: 'Acabás de dar el primer paso para ordenar tus finanzas. En unos minutos vas a recibir tu acceso por email.',
-    teaserTitle: 'Mientras tanto...',
-    teaserText: 'Hay algo que puede acelerar tus resultados.',
+    teaserTitle: 'Antes de seguir...',
+    teaserText: 'Plano.Money te va a mostrar exactamente a dónde va tu plata, mes a mes. Pero ver los números es solo el primer paso. Domina Tu Dinero te da el método completo para usar esa información: cómo salir de las deudas que te vienen pesando, armar un fondo de emergencia real, y ahorrar sin sentir que te estás privando de todo, aunque tus ingresos cambien mes a mes. Es la diferencia entre mirar tus finanzas y finalmente hacer algo con ellas.',
     ctaLabel: 'Continuar →',
     ctaHref: '/upsell-domina-tu-dinero',
   },
@@ -31,8 +39,8 @@ const TRANSITIONS = {
     statusLabel: 'Preparando todo...',
     title: '🎉 Perfecto.',
     subtitle: 'Ya quedó agregado a tu compra. No necesitás hacer nada más: se activa automáticamente junto con Plano.Money.',
-    teaserTitle: 'Antes de terminar...',
-    teaserText: 'Tenemos una última recomendación, pensada para quienes quieren resultados todavía más rápido.',
+    teaserTitle: 'Una cosa más...',
+    teaserText: 'Ya tenés el sistema (Plano.Money) y el método (Domina Tu Dinero). Pero la mayoría de los gastos que se te escapan no son un problema de método, son un problema emocional. Emoción y Dinero es un diario de 30 días para registrar cómo te sentís junto a cada gasto, y descubrir el patrón que te hace gastar de más antes de que vuelva a pasar. El complemento que le faltaba a todo lo demás.',
     ctaLabel: 'Continuar →',
     ctaHref: '/downsell-emocion-y-dinero',
   },
@@ -42,7 +50,9 @@ const TRANSITIONS = {
     checkLabel: 'Compra realizada',
     statusLabel: 'Buscando la mejor opción para vos...',
     title: 'Sin problema.',
-    subtitle: 'Tu compra principal ya quedó confirmada. Antes de continuar, quizás esta alternativa tenga más sentido para vos.',
+    subtitle: 'Tu compra principal ya quedó confirmada.',
+    teaserTitle: 'Antes de continuar...',
+    teaserText: 'Si lo que te está costando no es tanto saber organizar tus finanzas sino frenar el impulso de gastar, esto te puede servir más. Emoción y Dinero es un diario de 30 días para identificar qué sentís justo antes de cada gasto del que después te arrepentís, y cortar el patrón desde la raíz.',
     ctaLabel: 'Ver alternativa →',
     ctaHref: '/downsell-emocion-y-dinero',
   },
