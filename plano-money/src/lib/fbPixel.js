@@ -6,3 +6,13 @@ export function trackFbEvent(name, params) {
     window.fbq('track', name, params)
   }
 }
+
+// Para eventos que no son parte de los ~17 estándar de Meta (Lead, Purchase,
+// InitiateCheckout, etc.) — necesitan trackCustom en vez de track para
+// aparecer bien clasificados en el Administrador de Eventos, en vez de
+// perderse o marcarse como no reconocidos.
+export function trackFbCustomEvent(name, params) {
+  if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+    window.fbq('trackCustom', name, params)
+  }
+}

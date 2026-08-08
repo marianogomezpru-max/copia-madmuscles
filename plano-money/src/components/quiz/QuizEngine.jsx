@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChevronLeft, Check, Sparkles } from 'lucide-react'
 import Logo from '../Logo.jsx'
 import GaugeMeter from './GaugeMeter.jsx'
-import { trackFbEvent } from '../../lib/fbPixel.js'
+import { trackFbEvent, trackFbCustomEvent } from '../../lib/fbPixel.js'
 
 function stepVisible(step, answers) {
   if (!step.showIf) return true
@@ -139,6 +139,22 @@ export default function QuizEngine({ data }) {
     if (step?.type === 'loading') {
       const t = setTimeout(goNext, step.duration || 2200)
       return () => clearTimeout(t)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIndex])
+
+  // Un evento por cada paso que la persona efectivamente alcanza — permite
+  // armar el embudo completo del quiz en Meta (cuántos llegan a cada
+  // pregunta) y ver exactamente en qué paso se cae la gente, no solo si
+  // completó el quiz entero o no.
+  useEffect(() => {
+    if (stepIndex >= 0 && step) {
+      trackFbCustomEvent('QuizStep', {
+        quiz_id: data.quizId,
+        step_number: stepIndex + 1,
+        step_key: step.key || step.type,
+        total_steps: visibleSteps.length,
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIndex])
