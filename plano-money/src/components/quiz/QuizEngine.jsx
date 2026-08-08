@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { ChevronLeft, Check, Sparkles } from 'lucide-react'
 import Logo from '../Logo.jsx'
 import GaugeMeter from './GaugeMeter.jsx'
+import { trackFbEvent } from '../../lib/fbPixel.js'
 
 function stepVisible(step, answers) {
   if (!step.showIf) return true
@@ -453,7 +454,10 @@ export default function QuizEngine({ data }) {
               </a>
             ) : (
               <button
-                onClick={goNext}
+                onClick={() => {
+                  if (step.type === 'email') trackFbEvent('Lead')
+                  goNext()
+                }}
                 disabled={!canContinue}
                 className="w-full bg-navy-900 hover:bg-navy-800 disabled:opacity-30 text-white font-bold py-4 rounded-full text-base transition"
               >

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { ShieldCheck, Zap, ShieldQuestion, Lock as LockIcon, Mail as MailIcon, BadgeCheck as BadgeCheckIcon, Star, Clock, BadgeCheck, Play } from 'lucide-react'
 import Logo from '../components/Logo.jsx'
+import { trackFbEvent } from '../lib/fbPixel.js'
 
 // Son dos ofertas separadas en Hotmart (cada una con su propia Página de
 // Pago Personalizada, order bump, upsell y downsell) — no una sola con
@@ -170,6 +171,7 @@ export default function SalesPagePlanoMoney() {
           </p>
           <a
             href={CHECKOUT_URL}
+            onClick={() => trackFbEvent('InitiateCheckout')}
             className="inline-block bg-gradient-to-r from-lila-500 via-accent-600 to-celeste-500 hover:brightness-110 text-white font-bold py-4 px-9 rounded-full text-xl shadow-xl shadow-accent-600/30 transition hover:scale-105"
           >
             Quiero ordenar mis finanzas →
@@ -195,6 +197,7 @@ export default function SalesPagePlanoMoney() {
         <DemoVideo />
         <a
           href={CHECKOUT_URL}
+            onClick={() => trackFbEvent('InitiateCheckout')}
           className="inline-block mt-6 bg-gradient-to-r from-lila-500 via-accent-600 to-celeste-500 hover:brightness-110 text-white font-bold py-4 px-9 rounded-full text-xl shadow-xl shadow-accent-600/30 transition hover:scale-105"
         >
           Quiero ordenar mis finanzas →
@@ -302,12 +305,13 @@ export default function SalesPagePlanoMoney() {
             <p className="relative text-white text-xl font-black uppercase">Empezá hoy</p>
 
             <div className="relative grid grid-cols-2 gap-3 mt-3">
-              <a href={CHECKOUT_URL} className="block bg-white/5 hover:bg-white/10 border border-celeste-400/40 rounded-xl p-4 transition">
+              <a href={CHECKOUT_URL}
+            onClick={() => trackFbEvent('InitiateCheckout')} className="block bg-white/5 hover:bg-white/10 border border-celeste-400/40 rounded-xl p-4 transition">
                 <span className="inline-block bg-celeste-600 text-white text-xs font-black uppercase tracking-wide px-3 py-1 rounded-full">Mensual</span>
                 <p className="mt-2 text-2xl font-bold text-white/50 line-through">US$ 12.99</p>
                 <p className="text-3xl sm:text-4xl font-black text-white">US$ 5.99<span className="text-base font-semibold text-white/60">/mes</span></p>
               </a>
-              <a href={CHECKOUT_URL_ANNUAL} className="relative block bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/40 rounded-xl p-4 transition">
+              <a href={CHECKOUT_URL_ANNUAL} onClick={() => trackFbEvent('InitiateCheckout')} className="relative block bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-400/40 rounded-xl p-4 transition">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-navy-900 text-[10px] font-black uppercase tracking-wide px-2.5 py-1 rounded-full shadow whitespace-nowrap">
                   🔥 Más elegido
                 </span>
@@ -320,6 +324,7 @@ export default function SalesPagePlanoMoney() {
 
             <a
               href={CHECKOUT_URL}
+            onClick={() => trackFbEvent('InitiateCheckout')}
               className="relative block w-full bg-gradient-to-r from-lila-400 via-white to-celeste-300 text-navy-900 font-bold py-4 rounded-xl text-xl hover:brightness-105 transition"
             >
               Quiero ordenar mis finanzas →
