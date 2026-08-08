@@ -17,6 +17,12 @@ import Logo from '../components/Logo.jsx'
 // — no tenemos ese dato, así que el texto convence por contenido
 // concreto del producto, no por presión social inventada.
 //
+// Las tres comparten un hilo narrativo (la "luz" que Plano.Money prende
+// sobre tus gastos, y "el segundo antes de gastar" como el verdadero
+// punto de batalla que ni la luz ni el método cubren del todo) en vez de
+// ser tres pitches sueltos sin relación entre sí — se leen como
+// capítulos seguidos de la misma historia, no como ofertas repetidas.
+//
 // Sin video todavía — cuando haya uno real para un producto nuevo, va acá
 // mismo siguiendo el patrón de DemoVideo en SalesPagePlanoMoney.jsx.
 const TRANSITIONS = {
@@ -27,8 +33,8 @@ const TRANSITIONS = {
     statusLabel: 'Configurando tu acceso...',
     title: '🎉 ¡Excelente decisión!',
     subtitle: 'Acabás de dar el primer paso para ordenar tus finanzas. En unos minutos vas a recibir tu acceso por email.',
-    teaserTitle: 'Antes de seguir...',
-    teaserText: 'Plano.Money te va a mostrar exactamente a dónde va tu plata, mes a mes. Pero ver los números es solo el primer paso. Domina Tu Dinero te da el método completo para usar esa información: cómo salir de las deudas que te vienen pesando, armar un fondo de emergencia real, y ahorrar sin sentir que te estás privando de todo, aunque tus ingresos cambien mes a mes. Es la diferencia entre mirar tus finanzas y finalmente hacer algo con ellas.',
+    teaserTitle: 'Así arranca el cambio...',
+    teaserText: 'Hasta hoy, tu plata se movía en la oscuridad: gastos que aparecían sin que supieras bien cómo. Plano.Money prende la luz, mes a mes. Pero ver no alcanza: alguien tiene que decirte qué hacer con lo que estás viendo. Domina Tu Dinero es ese siguiente paso, el método completo para salir de las deudas, armar tu fondo de emergencia y ahorrar sin privarte de todo, aunque tus ingresos cambien.',
     ctaLabel: 'Continuar →',
     ctaHref: '/upsell-domina-tu-dinero',
   },
@@ -39,8 +45,8 @@ const TRANSITIONS = {
     statusLabel: 'Preparando todo...',
     title: '🎉 Perfecto.',
     subtitle: 'Ya quedó agregado a tu compra. No necesitás hacer nada más: se activa automáticamente junto con Plano.Money.',
-    teaserTitle: 'Una cosa más...',
-    teaserText: 'Ya tenés el sistema (Plano.Money) y el método (Domina Tu Dinero). Pero la mayoría de los gastos que se te escapan no son un problema de método, son un problema emocional. Emoción y Dinero es un diario de 30 días para registrar cómo te sentís junto a cada gasto, y reconocer el impulso antes de que se convierta en un gasto más del que te arrepentís.',
+    teaserTitle: 'Pero hay un momento que ni la luz ni el método cubren...',
+    teaserText: 'Es el segundo antes de gastar, cuando el impulso ya ganó y la decisión ya está tomada. Emoción y Dinero es un diario de 30 días para estar ahí, justo en ese momento, y entender qué lo dispara antes de que se repita.',
     ctaLabel: 'Continuar →',
     ctaHref: '/downsell-emocion-y-dinero',
   },
@@ -51,8 +57,8 @@ const TRANSITIONS = {
     statusLabel: 'Buscando la mejor opción para vos...',
     title: 'Sin problema.',
     subtitle: 'Tu compra principal ya quedó confirmada.',
-    teaserTitle: 'Pensalo así...',
-    teaserText: 'Capaz no es que te falte un método. Es que todavía no entendés qué te lleva a gastar justo en esos momentos que después te pesan. Emoción y Dinero es un diario de 30 días para identificar exactamente qué sentís antes de cada compra de la que te arrepentís, así la próxima vez elegís vos, no el impulso.',
+    teaserTitle: 'Capaz el método no era lo que te frenaba.',
+    teaserText: 'A veces no es no saber organizar la plata. Es el segundo antes de gastar, cuando el impulso ya ganó. Emoción y Dinero es un diario de 30 días para estar ahí, en ese momento exacto, entender qué lo dispara, y por fin elegir vos, no el impulso.',
     ctaLabel: 'Ver alternativa →',
     ctaHref: '/downsell-emocion-y-dinero',
   },
