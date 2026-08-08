@@ -493,6 +493,35 @@ export default function App() {
     return <div className="w-full min-h-[300px]" />
   }
 
+  // A "Crear mi cuenta" link from a purchase email carries ?access_code=
+  // and ?email= for the account it's meant to open — but if this browser
+  // already has an unrelated session logged in (e.g. testing on a device
+  // that's normally signed in as someone else), the checks below would
+  // silently show that other account instead, since they never look at
+  // the URL. Catch that mismatch here and let the person choose, instead
+  // of landing them in the wrong household with no explanation.
+  if (session?.user?.email) {
+    const params = new URLSearchParams(window.location.search)
+    const urlEmail = params.get('email')
+    const urlAccessCode = params.get('access_code')
+    if (urlAccessCode && urlEmail && urlEmail.toLowerCase() !== session.user.email.toLowerCase()) {
+      return (
+        <div className="w-full min-h-[300px] flex items-center justify-center p-6">
+          <div className="bg-white p-6 rounded-2xl shadow-xl border border-amber-200 max-w-md w-full text-center space-y-3">
+            <p className="text-sm font-semibold text-navy-900">Estás conectado como {session.user.email}</p>
+            <p className="text-xs text-slate-500">Este acceso es para {urlEmail}. Cerrá la sesión actual para crear o entrar a esa cuenta.</p>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="text-sm font-bold text-brand-600 hover:text-brand-700"
+            >
+              Cerrar sesión y continuar
+            </button>
+          </div>
+        </div>
+      )
+    }
+  }
+
   if (session && loadError) {
     return (
       <div className="w-full min-h-[300px] flex items-center justify-center p-6">
