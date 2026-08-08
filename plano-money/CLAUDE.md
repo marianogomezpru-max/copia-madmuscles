@@ -212,6 +212,25 @@ the product (same pattern as the Pixel/Clarity, one tracker instance
 per product) rather than reusing this one. Web data stream points at
 `plano-money.vercel.app`.
 
+## Interactive ebook reader: `InteractiveEbookReader.jsx`
+
+`src/components/content/InteractiveEbookReader.jsx` is the shared reader
+for the 3 long-form standalone ebooks (Domina Tu Dinero, El Cerebro y el
+Dinero, Del "Somos Dos" al "Somos Tres") — one component, edits apply to
+all 3 at once, content files stay plain data (no icon/color fields
+needed). Redesigned for higher perceived value: gradient color blobs
+behind the intro card (same lila/celeste blob pattern as `/quiz` and
+`/oferta`), a meta-info badge row (chapter count, estimated reading time
+from real word count, "con ejercicios interactivos"), and a visual index
+grid on the intro screen. Each chapter gets a deterministic icon +
+gradient from `CHAPTER_STYLES` (cycled by index, no data file changes
+needed) shown in the sidebar, the chapter header, and the index grid.
+Callout boxes (caso práctico, error común, consejo del experto, ideas
+clave, cita) each got an icon to match their color, instead of color
+alone. Keep this pattern (cycled icon+gradient by index, not per-item
+data) for any future long-form ebook added to the registry — don't hand
+-pick icons per chapter in the content file, the component derives them.
+
 ## Gamification pattern: `Reto21Dias.jsx`
 
 `src/components/resources/Reto21Dias.jsx` (shared between the main
